@@ -24,6 +24,7 @@
   "homepage": "https://github.com/Kinto/kinto-react-boilerplate#readme",
   "dependencies": {
     "btoa": "^1.1.2",
+    "moment": "^2.10.6",
     "react": "^0.13.3"
   },
   "devDependencies": {
