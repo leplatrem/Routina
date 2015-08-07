@@ -31,6 +31,17 @@ export class Store extends EventEmitter {
       .catch(this.onError.bind(this));
   }
 
+  update(record) {
+    return this.collection.update(record)
+      .then(res => {
+        this.state.items = this.state.items.map(item => {
+          return item.id === record.id ? res.data : item;
+        });
+        this.emit('change', this.state);
+      })
+      .catch(this.onError.bind(this));
+  }
+
   sync() {
     return this.collection.sync()
       .then((res) => {

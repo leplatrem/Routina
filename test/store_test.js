@@ -16,7 +16,7 @@ describe("Store", () => {
     store = new Store(kinto, "items");
 
     sandbox.stub(store.collection, "create")
-      .returns(Promise.resolve({data: {label: "Hola!"}}));
+      .returns(Promise.resolve({data: {id: 1, label: "Hola!"}}));
     store.create({})
       .then(done);
   });
@@ -53,10 +53,24 @@ describe("Store", () => {
 
     it("adds Kinto record to its state and emits change", (done) => {
       store.on("change", event => {
-        expect(event).to.eql({items: [{label: "Hola!"}, {label: "Hola!"}]});
+        expect(event).to.eql({items: [{id: 1, label: "Hola!"}, {id: 1, label: "Hola!"}]});
         done();
       });
       store.create({});
+    });
+  });
+
+
+  describe("#update()", () => {
+
+    it("update() replaces with Kinto record and emits change", (done) => {
+      sandbox.stub(store.collection, 'update')
+        .returns(Promise.resolve({data: {id: 1, label: "from db"}}));
+      store.on('change', event => {
+        expect(event).to.eql({items: [{id: 1, label: "from db"}]});
+        done();
+      });
+      store.update({id: 1, label: "Mundo"});
     });
   });
 
