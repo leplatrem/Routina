@@ -75,6 +75,20 @@ describe("Store", () => {
   });
 
 
+  describe("#delete()", () => {
+
+    it("removes record and emits change", (done) => {
+      sandbox.stub(store.collection, "delete")
+        .returns(Promise.resolve({}));
+      store.on('change', event => {
+        expect(event).to.eql({items: []});
+        done();
+      });
+      store.delete({id: 1, label: "Mundo"});
+    });
+  });
+
+
   describe("#sync()", () => {
 
     beforeEach(() => {

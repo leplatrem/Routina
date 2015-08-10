@@ -29,6 +29,7 @@ describe("App", () => {
 
     beforeEach(() => {
       sandbox.stub(store, "create").returns(Promise.resolve({}));
+      sandbox.stub(store, "delete").returns(Promise.resolve({}));
       sandbox.stub(store, "load").returns(Promise.resolve({}));
       sandbox.stub(store, "update").returns(Promise.resolve({}));
       sandbox.stub(store, "sync").returns(Promise.resolve({}));
@@ -50,20 +51,6 @@ describe("App", () => {
       TestUtils.Simulate.change(node, {target: {value: "Hello, world"}});
       TestUtils.Simulate.submit(node);
       sinon.assert.calledWithExactly(store.create, {label: "Hello, world"});
-    });
-
-    it("updates item in the store on edit", () => {
-      // Fill list.
-      store.emit("change", {items: [{label: "Existing"}]});
-      const item = React.findDOMNode(rendered).querySelector("li");
-      // Set an item in edition mode.
-      TestUtils.Simulate.click(item);
-      // Change and submit.
-      const field = React.findDOMNode(rendered).querySelector("li > form > input");
-      TestUtils.Simulate.change(field, {target: {value: "Hola, mundo"}});
-      TestUtils.Simulate.submit(field);
-      // Check that store was updated.
-      sinon.assert.calledWithExactly(store.update, {label: "Hola, mundo"});
     });
 
     it("syncs store on button click", () => {
@@ -99,6 +86,32 @@ describe("App", () => {
       let node = React.findDOMNode(rendered);
       expect(node.querySelector(".error").textContent).to.eql("");
     });
+
+
+    describe("Editing", () => {
+
+      beforeEach(() => {
+        // Fill list.
+        store.emit("change", {items: [{id: 42, label: "Existing"}]});
+        const item = React.findDOMNode(rendered).querySelector("li");
+        // Set an item in edition mode.
+        TestUtils.Simulate.click(item);
+      });
+
+      it("updates item in the store on edit", () => {
+        // Change and submit.
+        const field = React.findDOMNode(rendered).querySelector("li > form > input");
+        TestUtils.Simulate.change(field, {target: {value: "Hola, mundo"}});
+        TestUtils.Simulate.submit(field);
+        sinon.assert.calledWithExactly(store.update, {id: 42, label: "Hola, mundo"});
+      });
+
+      it("deletes item from the store", () => {
+        const button = React.findDOMNode(rendered).querySelector("li > button");
+        TestUtils.Simulate.click(button);
+        sinon.assert.calledWithExactly(store.delete, {id: 42, label: "Existing"});
+      });
+    });
   });
 });
 
@@ -124,11 +137,13 @@ describe("List", () => {
   describe("Editing", () => {
 
     var node;
-    var callback;
+    var updateCallback, deleteCallback;
 
     beforeEach(() => {
-      callback = sinon.spy();
-      rendered = TestUtils.renderIntoDocument(<List items={items} updateRecord={callback}/>);
+      updateCallback = sinon.spy();
+      deleteCallback = sinon.spy();
+      rendered = TestUtils.renderIntoDocument(<List items={items} updateRecord={updateCallback}
+                                                                  deleteRecord={deleteCallback}/>);
       node = React.findDOMNode(rendered);
 
       TestUtils.Simulate.click(node.querySelector("li:first-child"));
@@ -164,7 +179,17 @@ describe("List", () => {
 
     it("uses callback on save", () => {
       TestUtils.Simulate.submit(node.querySelector("form"));
-      sinon.assert.calledWithExactly(callback, {label: "Hola, mundo"});
+      sinon.assert.calledWithExactly(updateCallback, {label: "Hola, mundo"});
+    });
+
+    it("uses callback on delete", () => {
+      TestUtils.Simulate.click(node.querySelector("li > button"));
+      sinon.assert.calledOnce(deleteCallback);
+    });
+
+    it("hides form after delete", () => {
+      TestUtils.Simulate.click(node.querySelector("li > button"));
+      expect(node.querySelectorAll("form").length).to.equal(0);
     });
   });
 });
@@ -191,19 +216,21 @@ describe("Item", () => {
     var callback = sinon.spy();
     const item = TestUtils.renderIntoDocument(<Item item={{}} onEdit={callback}/>);
     TestUtils.Simulate.click(React.findDOMNode(item));
-    sinon.assert.calledWithExactly(callback, item);
+    sinon.assert.calledOnce(callback);
   });
 
 
   describe("Editing", () => {
 
-    var callback;
+    var saveCallback, deleteCallback;
 
     beforeEach(() => {
-      callback = sinon.spy();
+      saveCallback = sinon.spy();
+      deleteCallback = sinon.spy();
       rendered = TestUtils.renderIntoDocument(<Item editing={true}
                                                     item={{label: "Value"}}
-                                                    onSave={callback} />);
+                                                    onSave={saveCallback}
+                                                    onDelete={deleteCallback} />);
     });
 
     it("renders label in field value if editing", () => {
@@ -216,9 +243,14 @@ describe("Item", () => {
       var field = React.findDOMNode(rendered).querySelector("form > input")
       TestUtils.Simulate.change(field, {target: {value: newvalue}});
       TestUtils.Simulate.submit(field);
-      sinon.assert.calledWithExactly(callback, {label: newvalue});
+      sinon.assert.calledWithExactly(saveCallback, {label: newvalue});
     });
 
+    it("uses callback on delete", () => {
+      const node = React.findDOMNode(rendered).querySelector("li > button");
+      TestUtils.Simulate.click(node);
+      sinon.assert.calledOnce(deleteCallback);
+    });
   });
 });
 

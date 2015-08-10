@@ -5,3 +5,7 @@
 .error {
   color: red;
 }
+
+li > form {
+  display: inline-block;
+}

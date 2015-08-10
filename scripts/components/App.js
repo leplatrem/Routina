@@ -39,6 +39,7 @@ export class Item extends React.Component {
   static get defaultProps() {
     return {
       onEdit: () => {},
+      onDelete: () => {},
       onSave: () => {}
     };
   }
@@ -48,6 +49,7 @@ export class Item extends React.Component {
       return (
         <li key={this.props.key}>
           <Form record={this.props.item} saveRecord={this.props.onSave}/>
+          <button onClick={this.props.onDelete}>Delete</button>
         </li>
       );
     }
@@ -63,6 +65,7 @@ export class List extends React.Component {
   static get defaultProps() {
     return {
       updateRecord: () => {},
+      deleteRecord: () => {},
     };
   }
 
@@ -80,6 +83,11 @@ export class List extends React.Component {
     this.props.updateRecord(record);
   }
 
+  onDelete(record) {
+    this.setState({current: null});
+    this.props.deleteRecord(record);
+  }
+
   render() {
     return (
       <ul>{
@@ -88,6 +96,7 @@ export class List extends React.Component {
                        item={item}
                        editing={i === this.state.current}
                        onEdit={this.onEdit.bind(this, i)}
+                       onDelete={this.onDelete.bind(this, item)}
                        onSave={this.onSave.bind(this)} />;
         })
       }</ul>
@@ -114,6 +123,10 @@ export default class App extends React.Component {
     this.props.store.create(record);
   }
 
+  deleteRecord(record) {
+    this.props.store.delete(record);
+  }
+
   updateRecord(record) {
     this.props.store.update(record);
   }
@@ -129,6 +142,7 @@ export default class App extends React.Component {
       <div className={disabled}>
         <Form saveRecord={this.createRecord.bind(this)}/>
         <List updateRecord={this.updateRecord.bind(this)}
+              deleteRecord={this.deleteRecord.bind(this)}
               items={this.state.items}/>
         <button onClick={this.syncRecords.bind(this)} disabled={disabled}>Sync!</button>
         <div className="error">{this.state.error}</div>
