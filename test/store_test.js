@@ -3,6 +3,7 @@ import sinon from "sinon";
 import Kinto from "kinto";
 
 import { Store } from "../scripts/store";
+import { Routine } from "../scripts/models";
 
 
 describe("Store", () => {
@@ -10,14 +11,16 @@ describe("Store", () => {
   var sandbox;
   var store;
 
+  var sample = {id: 1, label: "Hola!"};
+
   beforeEach((done) => {
     sandbox = sinon.sandbox.create();
     const kinto = new Kinto();
     store = new Store(kinto, "items");
 
     sandbox.stub(store.collection, "create")
-      .returns(Promise.resolve({data: {id: 1, label: "Hola!"}}));
-    store.create({})
+      .returns(Promise.resolve({data: sample}));
+    store.create(new Routine())
       .then(done);
   });
 
@@ -36,12 +39,12 @@ describe("Store", () => {
 
     beforeEach(() => {
       sandbox.stub(store.collection, "list")
-        .returns(Promise.resolve({data: [{label: "from db"}]}));
+        .returns(Promise.resolve({data: [sample]}));
     });
 
     it("fills items and emits change", (done) => {
       store.on("change", event => {
-        expect(store.state.items).to.eql([{label: "from db"}]);
+        expect(store.state.items).to.eql([Routine.deserialize(sample)]);
         done();
       });
       store.load();
@@ -53,24 +56,28 @@ describe("Store", () => {
 
     it("adds Kinto record to its state and emits change", (done) => {
       store.on("change", event => {
-        expect(event).to.eql({items: [{id: 1, label: "Hola!"}, {id: 1, label: "Hola!"}]});
+        expect(event).to.eql({items: [Routine.deserialize(sample), Routine.deserialize(sample)]});
         done();
       });
-      store.create({});
+      store.create(new Routine());
     });
   });
 
 
   describe("#update()", () => {
 
+    const existing = {id: 1, label: "from db"};
+
     it("update() replaces with Kinto record and emits change", (done) => {
       sandbox.stub(store.collection, 'update')
-        .returns(Promise.resolve({data: {id: 1, label: "from db"}}));
+        .returns(Promise.resolve({data: existing}));
       store.on('change', event => {
-        expect(event).to.eql({items: [{id: 1, label: "from db"}]});
+        expect(event).to.eql({items: [Routine.deserialize(existing)]});
         done();
       });
-      store.update({id: 1, label: "Mundo"});
+
+      const updated = Routine.deserialize({id: 1, label: "Mundo"});
+      store.update(updated);
     });
   });
 
@@ -91,16 +98,18 @@ describe("Store", () => {
 
   describe("#sync()", () => {
 
+    const existing = {label: "from db"};
+
     beforeEach(() => {
       sandbox.stub(store.collection, "sync")
         .returns(Promise.resolve({ok: true}));
       sandbox.stub(store.collection, "list")
-        .returns(Promise.resolve({data: [{label: "from db"}]}));
+        .returns(Promise.resolve({data: [existing]}));
     });
 
     it("reloads the local db after sync if ok", (done) => {
       store.on("change", event => {
-        expect(event).to.eql({items: [{label: "from db"}]});
+        expect(event).to.eql({items: [Routine.deserialize(existing)]});
         done();
       });
       store.sync();
