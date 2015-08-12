@@ -52,7 +52,8 @@ describe("App", () => {
       const node = React.findDOMNode(rendered).querySelector("input");
       TestUtils.Simulate.change(node, {target: {value: "Hello, world"}});
       TestUtils.Simulate.submit(node);
-      sinon.assert.calledWithExactly(store.create, {label: "Hello, world"});
+      var createArg = store.create.lastCall.args[0];
+      expect(createArg.label).to.eql("Hello, world");
     });
 
     it("syncs store on button click", () => {
@@ -280,7 +281,7 @@ describe("Item", () => {
       saveCallback = sinon.spy();
       deleteCallback = sinon.spy();
       rendered = TestUtils.renderIntoDocument(<Item editing={true}
-                                                    item={{label: "Value"}}
+                                                    item={new Routine("Value")}
                                                     onSave={saveCallback}
                                                     onDelete={deleteCallback} />);
     });
@@ -295,7 +296,8 @@ describe("Item", () => {
       var field = React.findDOMNode(rendered).querySelector("form > input")
       TestUtils.Simulate.change(field, {target: {value: newvalue}});
       TestUtils.Simulate.submit(field);
-      sinon.assert.calledWithExactly(saveCallback, {label: newvalue});
+      const saveArg = saveCallback.lastCall.args[0];
+      expect(saveArg.label).to.eql(newvalue);
     });
 
     it("uses callback on delete", () => {
@@ -329,10 +331,11 @@ describe("Form", () => {
     expect(button.placeholder).to.equal("Label");
   });
 
-  it("contains an input field and a submit button", () => {
-    const selector = "button, input";
-    const nodes = React.findDOMNode(rendered).querySelectorAll(selector);
-    expect(nodes.length).to.equal(2);
+  it("contains an fields with default values and a submit button", () => {
+    const node = React.findDOMNode(rendered);
+    expect(node.querySelector("input[name='label']").value).to.eql("New task");
+    expect(node.querySelector("input[name='value']").value).to.eql("3");
+    expect(node.querySelector("select[name='unit']").value).to.eql("days");
   });
 
   it("uses callback on submit", () => {
@@ -342,24 +345,33 @@ describe("Form", () => {
     const newvalue = "Hola, mundo";
     TestUtils.Simulate.change(field, {target: {value: newvalue}});
     TestUtils.Simulate.submit(field);
-    sinon.assert.calledWithExactly(callback, {label: newvalue});
+
+    const saveArgs = callback.lastCall.args[0];
+    expect(saveArgs.label).to.eql(newvalue);
+    expect(saveArgs.period.value).to.eql(3);
+    expect(saveArgs.period.unit).to.eql("days");
   });
 
 
   describe("Editing", () => {
 
     var callback;
-    const record = {id: "42", label: "Value"};
+    var record;
 
     beforeEach(() => {
+      record = new Routine("Value", {value: 12, unit: "years"});
+      record.id = 42;
+
       callback = sinon.spy();
       rendered = TestUtils.renderIntoDocument(<Form record={record}
                                                     saveRecord={callback} />);
     });
 
-    it("renders label in field value if editing", () => {
+    it("renders record values in fields", () => {
       var node = React.findDOMNode(rendered);
-      expect(node.querySelector("input").value).to.equal("Value");
+      expect(node.querySelector("input[name='label']").value).to.equal("Value");
+      expect(node.querySelector("input[name='value']").value).to.equal("12");
+      expect(node.querySelector("select[name='unit']").value).to.equal("years");
     });
 
     it("updates its state when field change", () => {
@@ -369,13 +381,28 @@ describe("Form", () => {
       expect(rendered.state.record.label).to.equal(newvalue);
     });
 
+    it("updates period attributes when fields change", () => {
+      const newvalue = "days";
+      const field = React.findDOMNode(rendered).querySelector("form > select")
+      TestUtils.Simulate.change(field, {target: {value: newvalue}});
+      expect(rendered.state.record.period.unit).to.equal(newvalue);
+    });
+
     it("uses callback on submit", () => {
       const newvalue = "Hola, mundo";
       const field = React.findDOMNode(rendered).querySelector("form > input")
       TestUtils.Simulate.change(field, {target: {value: newvalue}});
       TestUtils.Simulate.submit(field);
-      sinon.assert.calledWithExactly(callback, {id: "42", label: newvalue});
+
+      const saveArgs = callback.lastCall.args[0];
+      expect(saveArgs.label).to.eql(newvalue);
+      expect(saveArgs.id).to.eql(record.id);
     });
 
+    it("clears form on submit", () => {
+      const node = React.findDOMNode(rendered);
+      TestUtils.Simulate.submit(node);
+      expect(rendered.state.record.label).to.equal("New task");
+    });
   });
 });

@@ -2,33 +2,57 @@ import React from "react";
 import moment from "moment";
 
 
+import { Routine } from "../../scripts/models";
+
+
 export class Form extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      record: this.props.record || {}
-    };
+    this.state = {record: this.props.record || this.newRoutine()};
+  }
+
+  newRoutine() {
+    return new Routine("New task", {value: 3, unit: "days"});
   }
 
   onFormSubmit(event) {
     event.preventDefault();
     this.props.saveRecord(this.state.record);
+    this.setState({record: this.newRoutine()});
   }
 
   onChange(field, event) {
-    var newrecord = Object.assign({}, this.state.record, {[field]: event.target.value});
-    this.setState({record: newrecord});
+    var value = event.target.value;
+    switch (field) {
+      case "value":
+        value = parseInt(value, 10);
+      case "unit":
+        Object.assign(this.state.record.period, {[field]: value});
+        break;
+      default:
+        Object.assign(this.state.record, {[field]: value});
+    }
+    this.setState({record: this.state.record});
   }
 
   render() {
+    const record = this.state.record;
     return (
       <form onSubmit={this.onFormSubmit.bind(this)}>
         <input autofocus name="label" type="text"
                placeholder="Label"
-               value={this.state.record.label}
+               value={record.label}
                onChange={this.onChange.bind(this, "label")} />
-        <button type="submit">{this.props.record ? "Save" : "Add"}</button>
+        <input name="value" type="number"
+               value={record.period.value}
+               onChange={this.onChange.bind(this, "value")} />
+        <select name="unit"
+                value={record.period.unit}
+                onChange={this.onChange.bind(this, "unit")}>
+          {Routine.units.map(u => <option value={u}>{u}</option>)}
+        </select>
+        <button className="submit" type="submit">{record.id ? "Save" : "Add"}</button>
       </form>
     );
   }
