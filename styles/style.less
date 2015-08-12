@@ -1,5 +1,46 @@
+/**
+ * Variables
+ */
+
+@font: Fira Sans;
 @disabled: GrayText;
 @error: red;
+@annotation: #888;
+
+@ok: green;
+@warning: #ffd800;
+@overdue: #FF7E00;
+@critical: #d70000;
+
+
+/**
+ * Macros
+ */
+
+.status (@color) {
+  box-shadow: inset 4px 0 0 0 @color;
+  background-color: fadeout(@color, 80%);
+  color: @color;
+}
+
+
+/**
+ * Style
+ */
+
+html, body {
+  width: 100%;
+  padding: 0px;
+  font-family: @font;
+}
+
+body {
+  overflow: auto;
+}
+
+button {
+  background-color: #F2F1F0;
+}
 
 .disabled {
   color: @disabled;
@@ -7,4 +48,114 @@
 
 .error {
   color: @error;
+}
+
+.nopad {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.hbox {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.fit {
+  flex-grow: 1;
+}
+
+.pull-end {
+  margin-left: auto;
+}
+
+li {
+
+  & > * {
+    margin-left: 5px;
+  }
+  & > *:last-child {
+    margin-right: 5px;
+  }
+
+
+  &.ok button.check {
+    .status(@ok);
+  }
+
+  &.warning button.check {
+    .status(@warning);
+  }
+
+  &.overdue button.check {
+    .status(@overdue);
+  }
+
+  &.critical button.check {
+    .status(@critical);
+  }
+
+  .routine {
+    font-size: 1.2em;
+    font-weight: bold;
+  }
+
+  .next {
+    color: @annotation;
+    padding-left: 2px;
+    display: block;
+  }
+
+  .details {
+    align-self: center;
+
+    & > span {
+      display: block;
+      width: 100%;
+      text-align: center;
+    }
+
+    .last {
+      color: @annotation;
+
+      &::before {
+        content: "(";
+      }
+      &::after {
+        content: ")";
+      }
+    }
+
+    .period {
+      .value::before,
+      .unit::before {
+        content: "\a0";
+      }
+    }
+  }
+}
+
+.create {
+  padding-right: 5px;
+  margin-bottom: 15px;
+}
+
+form {
+  .form-control {
+    margin-left: 5px;
+    padding: 6px 3px;
+  }
+
+  input[name='label'] {
+    min-width: 0;
+    display: inline;
+  }
+
+  input[name='value'] {
+    max-width: 4em;
+  }
+
+  button[type='submit'] {
+    margin-left: 5px;
+  }
 }

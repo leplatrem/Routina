@@ -63,14 +63,14 @@ describe("App", () => {
     });
 
     it("syncs store on button click", () => {
-      const node = React.findDOMNode(rendered).querySelector("div > button");
+      const node = React.findDOMNode(rendered).querySelector("button.sync");
       TestUtils.Simulate.click(node);
       sinon.assert.calledOnce(store.sync);
     });
 
     it("disables button during sync", () => {
       rendered.syncRecords();
-      let selector = ".disabled button[disabled]";
+      let selector = ".disabled button.sync[disabled]";
       let node = React.findDOMNode(rendered);
       expect(node.querySelector(selector)).to.exist;
       store.emit("change", {});
@@ -112,7 +112,7 @@ describe("App", () => {
 
       it("updates item in the store on edit", () => {
         // Change and submit.
-        const field = React.findDOMNode(rendered).querySelector("li > form > input");
+        const field = React.findDOMNode(rendered).querySelector("input[name='label']");
         TestUtils.Simulate.change(field, {target: {value: "Hola, mundo"}});
         TestUtils.Simulate.submit(field);
         var updateArg = store.update.lastCall.args[0];
@@ -163,7 +163,7 @@ describe("List", () => {
       node = React.findDOMNode(rendered);
 
       TestUtils.Simulate.click(node.querySelector("li:first-child button.edit"));
-      const field = node.querySelector("li > form > input");
+      const field = node.querySelector("input[name='label']");
       TestUtils.Simulate.change(field, {target: {value: "Hola, mundo"}});
     });
 
@@ -233,8 +233,8 @@ describe("Item", () => {
     expect(React.findDOMNode(rendered).tagName).to.equal("LI");
   });
 
-  it("renders routine label in a label span", () => {
-    expect(node.querySelector("span.label").textContent).to.equal("Value");
+  it("renders routine label in a routine span", () => {
+    expect(node.querySelector("span.routine").textContent).to.equal("Value");
   });
 
   it("renders routine status in item class", () => {
@@ -309,7 +309,7 @@ describe("Item", () => {
 
     it("uses callback on save", () => {
       var newvalue = "Hello, world";
-      var field = React.findDOMNode(rendered).querySelector("form > input")
+      var field = React.findDOMNode(rendered).querySelector("input[name='label']")
       TestUtils.Simulate.change(field, {target: {value: newvalue}});
       TestUtils.Simulate.submit(field);
       const saveArg = saveCallback.lastCall.args[0];
@@ -317,7 +317,7 @@ describe("Item", () => {
     });
 
     it("uses callback on delete", () => {
-      const node = React.findDOMNode(rendered).querySelector("li > button");
+      const node = React.findDOMNode(rendered).querySelector("button.delete");
       TestUtils.Simulate.click(node);
       sinon.assert.calledOnce(deleteCallback);
     });
@@ -339,7 +339,7 @@ describe("Form", () => {
 
   it("shows add button if no record", () => {
     const button = React.findDOMNode(rendered).querySelector("button");
-    expect(button.textContent).to.equal("Add");
+    expect(button.getAttribute("aria-label")).to.equal("Add");
   });
 
   it("sets placeholder if no record", () => {
@@ -357,7 +357,7 @@ describe("Form", () => {
   it("uses callback on submit", () => {
     const callback = sinon.spy();
     rendered = TestUtils.renderIntoDocument(<Form saveRecord={callback}/>);
-    const field = React.findDOMNode(rendered).querySelector("form > input")
+    const field = React.findDOMNode(rendered).querySelector("input[name='label']")
     const newvalue = "Hola, mundo";
     TestUtils.Simulate.change(field, {target: {value: newvalue}});
     TestUtils.Simulate.submit(field);
@@ -392,21 +392,21 @@ describe("Form", () => {
 
     it("updates its state when field change", () => {
       const newvalue = "Hola, mundo";
-      const field = React.findDOMNode(rendered).querySelector("form > input")
+      const field = React.findDOMNode(rendered).querySelector("input[name='label']")
       TestUtils.Simulate.change(field, {target: {value: newvalue}});
       expect(rendered.state.record.label).to.equal(newvalue);
     });
 
     it("updates period attributes when fields change", () => {
       const newvalue = "days";
-      const field = React.findDOMNode(rendered).querySelector("form > select")
+      const field = React.findDOMNode(rendered).querySelector("select[name='unit']")
       TestUtils.Simulate.change(field, {target: {value: newvalue}});
       expect(rendered.state.record.period.unit).to.equal(newvalue);
     });
 
     it("uses callback on submit", () => {
       const newvalue = "Hola, mundo";
-      const field = React.findDOMNode(rendered).querySelector("form > input")
+      const field = React.findDOMNode(rendered).querySelector("input[name='label']")
       TestUtils.Simulate.change(field, {target: {value: newvalue}});
       TestUtils.Simulate.submit(field);
 
