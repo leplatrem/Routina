@@ -49,6 +49,19 @@ describe("Store", () => {
       });
       store.load();
     });
+
+    it("sorts routines by timeleft", () => {
+      const shuffled = [
+        new Routine("1", {value: 1, unit: "days"}),
+        new Routine("3", {value: 3, unit: "days"}),
+        new Routine("2", {value: 2, unit: "days"}),
+      ];
+      store.collection.list.returns(Promise.resolve({data: shuffled}));
+      store.on("change", event => {
+        const sorted = store.state.items.map(r => r.label);
+        expect(sorted).to.eql(["1", "2", "3"]);
+      });
+    });
   });
 
 
@@ -137,6 +150,41 @@ describe("Store", () => {
         done();
       });
       store.sync();
+    });
+  });
+
+
+  describe("Autorefresh", () => {
+    var clock;
+    var callback;
+
+    beforeEach(() => {
+      clock = sinon.useFakeTimers();
+      callback = sinon.spy();
+      store.on("change", callback);
+    });
+
+    afterEach(() => {
+      clock.restore();
+    });
+
+    it("does not autorefresh by default", () => {
+      clock.tick(6000);
+      expect(callback.called).to.be.false;
+    });
+
+    it("autorefreshes every 5 seconds", () => {
+      store.autorefresh = true;
+      clock.tick(5002);
+      expect(callback.calledOnce).to.be.true;
+    });
+
+    it("cancels autorefresh if set to false", () => {
+      store.autorefresh = true;
+      clock.tick(3000);
+      store.autorefresh = false;
+      clock.tick(6000);
+      expect(callback.called).to.be.false;
     });
   });
 });
