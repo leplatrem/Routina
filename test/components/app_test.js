@@ -91,6 +91,25 @@ describe("App", () => {
     });
 
 
+    describe("Authenticated", () => {
+      const user = "abcde";
+
+      beforeEach(() => {
+        rendered = TestUtils.renderIntoDocument(<App store={store} user={user}/>);
+      });
+
+      it("sync records on mount if user is provided", () => {
+        sinon.assert.calledOnce(store.sync);
+      });
+
+      it("shows a permalink with location hash", () => {
+        var node = React.findDOMNode(rendered);
+        var selector = "a[href='https://leplatrem.github.io/Routina/#" + user + "']"
+        expect(node.querySelectorAll(selector).length).to.eql(1);
+      })
+    })
+
+
     describe("Editing", () => {
 
       var record;

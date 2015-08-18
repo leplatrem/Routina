@@ -186,7 +186,11 @@ export default class App extends React.Component {
       this.props.store.autorefresh = true;
       this.setState({busy: false, error: error.message});
     });
+
     this.props.store.load();
+    if (this.props.user) {
+      this.syncRecords();
+    }
   }
 
   editItem() {
@@ -225,9 +229,13 @@ export default class App extends React.Component {
         </div>
         <div className="hbox">
           <button className="btn default sync fit" data-icon="sync" onClick={this.syncRecords.bind(this)} disabled={disabled}>
-          <span className="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span>
-          &nbsp;Sync
+            <span className="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span>
+            &nbsp;Sync
           </button>
+          <a href={"https://leplatrem.github.io/Routina/#" + this.props.user}>
+            <span className="glyphicon glyphicon-link" aria-hidden="true"></span>
+            Permalink
+          </a>
         </div>
       </section>
     );
