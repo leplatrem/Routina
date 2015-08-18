@@ -11,7 +11,7 @@ module.exports = {
   output: {
     path: path.join(__dirname, "assets"),
     filename: "bundle.js",
-    publicPath: "assets/"
+    publicPath: "/assets/"
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
@@ -22,8 +22,7 @@ module.exports = {
   },
   module: {
     loaders: [
-      { test: /\.jsx?$/,   loaders: ["react-hot", "babel"],
-        include: path.join(__dirname, "scripts") },
+      { test: /\.jsx?$/, loaders: ["react-hot", "babel"], include: path.join(__dirname, "scripts") },
       { test: /\.less$/, loader: 'style!css!less' },
       // Font files
       { test: /\.woff2?(\?v=\d+\.\d+\.\d+)?$/, loader: "url?limit=10000&mimetype=application/font-woff" },

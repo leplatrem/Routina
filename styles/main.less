@@ -6,6 +6,9 @@
 @disabled: GrayText;
 @error: red;
 @annotation: #888;
+@decoration: #ddd;
+
+@spacing: 4px;
 
 @ok: green;
 @warning: #ffd800;
@@ -38,8 +41,9 @@ body {
   overflow: auto;
 }
 
-button {
-  background-color: #F2F1F0;
+.btn.default {
+  background-color: transparent;
+  border-color: @decoration;
 }
 
 .disabled {
@@ -50,15 +54,23 @@ button {
   color: @error;
 }
 
-.nopad {
-  padding-left: 0px;
-  padding-right: 0px;
-}
-
 .hbox {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
+
+  & > *, & > *:first-child {
+    margin-left: @spacing;
+  }
+  & > *:last-child {
+    margin-right: @spacing;
+  }
+}
+
+.nopad {
+  padding-left: 0px;
+  padding-right: 0px;
 }
 
 .fit {
@@ -71,13 +83,9 @@ button {
 
 li {
 
-  & > * {
-    margin-left: 5px;
+  &.hbox {
+    align-items: stretch;
   }
-  & > *:last-child {
-    margin-right: 5px;
-  }
-
 
   &.ok button.check {
     .status(@ok);
@@ -136,13 +144,25 @@ li {
 }
 
 .create {
-  padding-right: 5px;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+  padding-left: @spacing;
+  padding-right: @spacing;
+
+  form {
+    padding: @spacing 0px;
+    border-radius: 4px;
+    border: 1px solid @decoration;
+  }
 }
 
 form {
+
+  &.hbox, &.hbox:last-child {
+    margin: 0px;
+  }
+
   .form-control {
-    margin-left: 5px;
+    margin-left: @spacing;
     padding: 6px 3px;
   }
 
@@ -156,6 +176,6 @@ form {
   }
 
   button[type='submit'] {
-    margin-left: 5px;
+    margin-left: @spacing;
   }
 }
