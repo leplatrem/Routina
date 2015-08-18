@@ -1,28 +1,31 @@
 {
-  "name": "kinto-react-bootstrap",
-  "version": "0.0.1",
-  "description": "A Kinto+React project boilerplate.",
+  "name": "routina",
+  "version": "1.0.0",
+  "description": "Periodical tasks, rescheduled when checked",
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
-    "test": "node_modules/.bin/mocha --compilers js:babel/register 'test/*_test.js' && node_modules/.bin/karma start"
+    "test": "node_modules/.bin/mocha --compilers js:babel/register 'test/*_test.js' && node_modules/.bin/karma start",
+    "build": "NODE_ENV=production node_modules/.bin/webpack --optimize-minimize --config webpack.prod.config.js",
+    "build": "npm run build && zip -r routina.zip assets icons index.html manifest.webapp"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Kinto/kinto-react-boilerplate.git"
+    "url": "git+https://github.com/leplatrem/Routina.git"
   },
   "keywords": [
     "kinto",
     "react",
-    "boilerplate"
+    "todolist"
   ],
-  "author": "Nicolas Perriault <nperriault@mozilla.com>",
-  "license": "MPL-2.0",
+  "author": "Mathieu Leplatre <mathieu@mozilla.com>",
+  "license": "APL-2.0",
   "bugs": {
-    "url": "https://github.com/Kinto/kinto-react-boilerplate/issues"
+    "url": "https://github.com/leplatrem/Routina/issues"
   },
-  "homepage": "https://github.com/Kinto/kinto-react-boilerplate#readme",
+  "homepage": "https://github.com/leplatrem/Routina#readme",
   "dependencies": {
+    "bootstrap": "^3.3.5",
     "btoa": "^1.1.2",
     "moment": "^2.10.6",
     "react": "^0.13.3",
@@ -33,6 +36,7 @@
     "babel-loader": "^5.3.2",
     "chai": "^3.2.0",
     "css-loader": "^0.15.6",
+    "file-loader": "^0.8.4",
     "karma": "^0.13.3",
     "karma-chai": "^0.1.0",
     "karma-cli": "^0.1.0",
@@ -48,6 +52,7 @@
     "react-hot-loader": "^1.2.8",
     "sinon": "git://github.com/uberVU/Sinon.JS.git#0aaf834c9f",
     "style-loader": "^0.12.3",
+    "url-loader": "^0.5.6",
     "webpack": "^1.10.5",
     "webpack-dev-server": "^1.10.1"
   }
