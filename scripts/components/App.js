@@ -1,4 +1,5 @@
 import React from "react";
+import moment from "moment";
 
 
 export class Form extends React.Component {
@@ -44,17 +45,38 @@ export class Item extends React.Component {
     };
   }
 
+  onCheck() {
+    this.props.item.check();
+    this.props.onSave(this.props.item);
+  }
+
   render() {
     if (this.props.editing) {
       return (
         <li key={this.props.key}>
           <Form record={this.props.item} saveRecord={this.props.onSave}/>
-          <button onClick={this.props.onDelete}>Delete</button>
+          <button className="delete" onClick={this.props.onDelete}>Delete</button>
         </li>
       );
     }
+
+    const item = this.props.item;
+    const next = moment(item.next).fromNow().replace("ago", "late");
+    const last = item.last ? moment(item.last).fromNow() : "Never";
+
     return (
-      <li onClick={this.props.onEdit} key={this.props.key}>{this.props.item.label}</li>
+      <li key={this.props.key} className={item.status}>
+        <button className="check" onClick={this.onCheck.bind(this)}>&#x2713;</button>
+        <span className="next">{next}</span>
+        <span className="label">{item.label}</span>
+        <span className="last">{last}</span>
+        <span className="period">
+          Every
+          <span className="value">{item.period.value}</span>
+          <span className="unit">{item.period.unit}</span>
+        </span>
+        <button className="edit" onClick={this.props.onEdit}>Edit</button>
+      </li>
     );
   }
 }

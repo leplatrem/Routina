@@ -10,7 +10,7 @@ export class Routine {
    * @return {Object} period An object with two properties
                              ``value`` and ``unit``.
    */
-  constructor (label, period) {
+  constructor (label, period={}) {
     this.label = label;
     this.period = period;
     this.occurences = [];

@@ -3,9 +3,11 @@ import TestUtils from "react/lib/ReactTestUtils";
 import { expect } from "chai";
 import sinon from "sinon";
 import Kinto from "kinto";
+import moment from "moment";
 
 import App, { Form, List, Item } from "../../scripts/components/App";
 import { Store } from "../../scripts/store";
+import { Routine } from "../../scripts/models";
 
 
 describe("App", () => {
@@ -41,9 +43,9 @@ describe("App", () => {
     });
 
     it("renders items of store when store changes", () => {
-      store.emit("change", {items: [{id: "id", label: ":)"}]});
+      store.emit("change", {items: [new Routine(":)")]});
       let node = React.findDOMNode(rendered);
-      expect(node.querySelector("li").textContent).to.eql(":)");
+      expect(node.querySelector("li").textContent).to.contain(":)");
     });
 
     it("adds item to the store on form submit", () => {
@@ -68,12 +70,6 @@ describe("App", () => {
       expect(node.querySelector(selector)).to.not.exist;
     });
 
-    it("renders items of store when store changes", () => {
-      store.emit("change", {items: [{id: "id", label: ":)"}]});
-      let node = React.findDOMNode(rendered);
-      expect(node.querySelector("li").textContent).to.eql(":)");
-    });
-
     it("shows message when error happens", () => {
       store.emit("error", new Error("Failed"));
       let node = React.findDOMNode(rendered);
@@ -90,10 +86,15 @@ describe("App", () => {
 
     describe("Editing", () => {
 
+      var record;
+
       beforeEach(() => {
+        record = new Routine("Existing");
+        record.id = 42;
+
         // Fill list.
-        store.emit("change", {items: [{id: 42, label: "Existing"}]});
-        const item = React.findDOMNode(rendered).querySelector("li");
+        store.emit("change", {items: [record]});
+        const item = React.findDOMNode(rendered).querySelector("button.edit");
         // Set an item in edition mode.
         TestUtils.Simulate.click(item);
       });
@@ -103,13 +104,15 @@ describe("App", () => {
         const field = React.findDOMNode(rendered).querySelector("li > form > input");
         TestUtils.Simulate.change(field, {target: {value: "Hola, mundo"}});
         TestUtils.Simulate.submit(field);
-        sinon.assert.calledWithExactly(store.update, {id: 42, label: "Hola, mundo"});
+        var updateArg = store.update.lastCall.args[0];
+        expect(updateArg.id).to.eql(42);
+        expect(updateArg.label).to.eql("Hola, mundo");
       });
 
       it("deletes item from the store", () => {
-        const button = React.findDOMNode(rendered).querySelector("li > button");
+        const button = React.findDOMNode(rendered).querySelector("button.delete");
         TestUtils.Simulate.click(button);
-        sinon.assert.calledWithExactly(store.delete, {id: 42, label: "Existing"});
+        sinon.assert.calledWithExactly(store.delete, record);
       });
     });
   });
@@ -119,7 +122,7 @@ describe("App", () => {
 describe("List", () => {
 
   var rendered;
-  const items = [{label: "Hello"}, {label: "World"}];
+  const items = [new Routine("Hello"), new Routine("World")];
 
   beforeEach(() => {
     rendered = TestUtils.renderIntoDocument(<List items={items}/>);
@@ -146,7 +149,7 @@ describe("List", () => {
                                                                   deleteRecord={deleteCallback}/>);
       node = React.findDOMNode(rendered);
 
-      TestUtils.Simulate.click(node.querySelector("li:first-child"));
+      TestUtils.Simulate.click(node.querySelector("li:first-child button.edit"));
       const field = node.querySelector("li > form > input");
       TestUtils.Simulate.change(field, {target: {value: "Hola, mundo"}});
     });
@@ -161,25 +164,26 @@ describe("List", () => {
     });
 
     it("allows editing only one item at a time", () => {
-      TestUtils.Simulate.click(node.querySelector("li:last-child"));
+      TestUtils.Simulate.click(node.querySelector("li:last-child button.edit"));
       expect(node.querySelectorAll("form").length).to.equal(1);
     });
 
     it("allows editing the same item several times", () => {
       TestUtils.Simulate.submit(node.querySelector("form"));
-      TestUtils.Simulate.click(node.querySelector("li:first-child"));
+      TestUtils.Simulate.click(node.querySelector("li:first-child button.edit"));
       expect(node.querySelectorAll("form").length).to.equal(1);
     });
 
     it("cancels edition when other item is clicked", () => {
-      TestUtils.Simulate.click(node.querySelector("li:last-child"));
-      const label = node.querySelector("li:first-child");
-      expect(React.findDOMNode(label).textContent).to.equal("Hello");
+      TestUtils.Simulate.click(node.querySelector("li:last-child button.edit"));
+      const form = node.querySelectorAll("li:first-child form");
+      expect(form.length).to.equal(0);
     });
 
     it("uses callback on save", () => {
       TestUtils.Simulate.submit(node.querySelector("form"));
-      sinon.assert.calledWithExactly(updateCallback, {label: "Hola, mundo"});
+      var updateArg = updateCallback.lastCall.args[0];
+      expect(updateArg.label).to.eql("Hola, mundo");
     });
 
     it("uses callback on delete", () => {
@@ -198,25 +202,73 @@ describe("List", () => {
 describe("Item", () => {
 
   var rendered;
+  var record;
+  var node;
 
   beforeEach(() => {
-    rendered = TestUtils.renderIntoDocument(<Item item={{label: "Value"}}/>);
+    record = new Routine("Value", {value: 4, unit: "days"});
+    record.check();
+    rendered = TestUtils.renderIntoDocument(<Item item={record}/>);
+    node = React.findDOMNode(rendered);
   });
 
   it("renders without problems", () => {
     expect(React.findDOMNode(rendered).tagName).to.equal("LI");
   });
 
-  it("renders label in item text", () => {
-    var node = React.findDOMNode(rendered);
-    expect(node.textContent).to.equal("Value");
+  it("renders routine label in a label span", () => {
+    expect(node.querySelector("span.label").textContent).to.equal("Value");
   });
+
+  it("renders routine status in item class", () => {
+    expect(node.className).to.contain("ok");
+  });
+
+  it("renders routine period in a period span", () => {
+    expect(node.querySelector(".period").textContent).equal("Every4days");
+    expect(node.querySelector(".period .value").textContent).equal("4");
+    expect(node.querySelector(".period .unit").textContent).equal("days");
+  });
+
+  it("renders routine next occurence in a next span", () => {
+    expect(node.querySelector(".next").textContent).to.contain("in");
+  });
+
+  it("renders routine last occurence in a last span", () => {
+    expect(node.querySelector(".last").textContent).to.contain("ago");
+  });
+
+  it("display last as never if never checked", () => {
+    rendered = TestUtils.renderIntoDocument(<Item item={new Routine()}/>);
+    node = React.findDOMNode(rendered);
+    expect(node.querySelector(".last").textContent).to.eql("Never");
+  });
+
+  it("display late if task is overdue", () => {
+    const longTimeAgo = moment().subtract(6, "days").toDate();
+    record.occurences = [longTimeAgo];
+    rendered = TestUtils.renderIntoDocument(<Item item={record}/>);
+    node = React.findDOMNode(rendered);
+    expect(node.querySelector(".next").textContent).to.contain("late");
+  });
+
 
   it("uses callback on edit", () => {
     var callback = sinon.spy();
-    const item = TestUtils.renderIntoDocument(<Item item={{}} onEdit={callback}/>);
-    TestUtils.Simulate.click(React.findDOMNode(item));
+    const item = TestUtils.renderIntoDocument(<Item item={record} onEdit={callback}/>);
+    node = React.findDOMNode(item).querySelector("button.edit");
+    TestUtils.Simulate.click(node);
     sinon.assert.calledOnce(callback);
+  });
+
+  it("checks routine and call save callback", () => {
+    var callback = sinon.spy();
+    const item = TestUtils.renderIntoDocument(<Item item={record} onSave={callback}/>);
+    node = React.findDOMNode(item).querySelector("button.check");
+    expect(record.occurences.length).to.eql(1);
+    TestUtils.Simulate.click(node);
+    expect(record.occurences.length).to.eql(2);
+    sinon.assert.calledWithExactly(callback, record);
   });
 
 
