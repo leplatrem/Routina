@@ -1,5 +1,7 @@
 {
   "name": "Routina",
+  "version": "1.0",
+  "installs_allowed_from": ["*"],
   "description": "Periodical tasks, rescheduled when checked.",
   "launch_path": "/index.html",
   "default_locale": "en",
