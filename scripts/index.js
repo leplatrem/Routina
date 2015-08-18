@@ -3,7 +3,7 @@
  */
 require("bootstrap/less/bootstrap.less");
 require("../styles/fira.less");
-require("../styles/style.less");
+require("../styles/main.less");
 
 /*
  * Routina.
