@@ -1,0 +1,23 @@
+CACHE MANIFEST
+# 2015-08-18:v2
+
+index.html
+
+CACHE:
+# for f in `ls assets`; do echo assets/$f; done
+assets/0ed10407356f296980956152c097d932.woff2
+assets/24072a8021ae9031e702cc98d0b970ef.eot
+assets/299cd657b16b0d7f9cb1cd890e935a9d.woff2
+assets/448c34a56d699c29117adc64c43affeb.woff2
+assets/6098762daee4e4f41d01d53e4f88bcfc.woff
+assets/89889688147bd7575d6327160d64e760.svg
+assets/ba1f3bb83d99f39922a59d9fc74f5997.woff
+assets/bundle.js
+assets/e18bbf611f2a2e43afc071aa2f4e1512.ttf
+assets/f4769f9bdb7466be65088239c12046d1.eot
+assets/fa2772327f55d8198301fdb8bcfc8158.woff
+assets/fddeb422f43b78c998446318024f9e48.eot
+assets/vendors.js
+
+NETWORK:
+*
