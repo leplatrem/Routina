@@ -36,4 +36,4 @@ const store = new Store(kinto, "routina-v1");
 // Note: Kinto.js will have an option: https://github.com/Kinto/kinto.js/pull/111
 store.collection.db.dbname = userpass64 + store.collection.db.dbname;
 
-React.render(<App store={store}/>, document.getElementById("app"));
+React.render(<App store={store} user={user}/>, document.getElementById("app"));
