@@ -85,7 +85,7 @@ export class Item extends React.Component {
       return (
         <li key={this.props.key} className="hbox nopad list-group-item">
           <button onClick={this.props.onDelete} className="btn btn-danger delete" aria-label="Delete">
-            <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
+            <span className="glyphicon glyphicon-trash" aria-hidden="true"></span>
           </button>
           <Form record={this.props.item} saveRecord={this.props.onSave}/>
         </li>
