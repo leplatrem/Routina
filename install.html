@@ -1,9 +1,10 @@
 <html>
   <body>
-    <p>Routine installation page</p>
+    <h1>Routina</h1>
+    <p>Installation page tested on Firefox (Desktop, Android, FirefoxOS)</p>
     <script>
       // This URL must be a full url.
-      var manifestUrl = 'https://leplatrem.github.io/Routina/manifest.webapp';
+      var manifestUrl = 'https://leplatrem.github.io/Routina/install.webapp';
       var req = navigator.mozApps.installPackage(manifestUrl);
       req.onsuccess = function() {
         alert(this.result.origin);
