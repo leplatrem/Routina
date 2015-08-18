@@ -117,7 +117,7 @@ export class Item extends React.Component {
           </span>
           <span className="last">{last}</span>
         </div>
-        <button onClick={this.props.onEdit} className="btn edit" aria-label="Edit">
+        <button onClick={this.props.onEdit} className="btn default edit" aria-label="Edit">
           <span className="glyphicon glyphicon-pencil" aria-hidden="true"></span>
         </button>
       </li>
@@ -224,7 +224,10 @@ export default class App extends React.Component {
           <Form saveRecord={this.createRecord.bind(this)}/>
         </div>
         <div className="hbox">
-          <button className="btn sync fit" data-icon="sync" onClick={this.syncRecords.bind(this)} disabled={disabled}> Sync</button>
+          <button className="btn default sync fit" data-icon="sync" onClick={this.syncRecords.bind(this)} disabled={disabled}>
+          <span className="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span>
+          &nbsp;Sync
+          </button>
         </div>
       </section>
     );
