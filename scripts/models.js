@@ -32,7 +32,7 @@ export class Routine {
    * Period unit constants.
    */
   static get units() {
-    return ["seconds", "minutes", "hours", "days", "months", "years"];
+    return ["seconds", "minutes", "hours", "days", "weeks", "months", "years"];
   }
 
   /**
