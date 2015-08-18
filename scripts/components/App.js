@@ -110,6 +110,7 @@ export class List extends React.Component {
 
   static get defaultProps() {
     return {
+      editItem: () => {},
       updateRecord: () => {},
       deleteRecord: () => {},
     };
@@ -122,6 +123,7 @@ export class List extends React.Component {
 
   onEdit(index) {
     this.setState({current: index});
+    this.props.editItem(index);
   }
 
   onSave(record) {
@@ -157,12 +159,19 @@ export default class App extends React.Component {
     super(props);
     this.state = this.props.store.state;
     this.props.store.on("change", state => {
+      this.props.store.autorefresh = true;
       this.setState(Object.assign({busy: false}, state));
     });
     this.props.store.on("error", error => {
+      this.props.store.autorefresh = true;
       this.setState({busy: false, error: error.message});
     });
     this.props.store.load();
+  }
+
+  editItem() {
+    // Stop auto-refresh while item is being edited.
+    this.props.store.autorefresh = false;
   }
 
   createRecord(record) {
@@ -187,7 +196,8 @@ export default class App extends React.Component {
     return (
       <div className={disabled}>
         <Form saveRecord={this.createRecord.bind(this)}/>
-        <List updateRecord={this.updateRecord.bind(this)}
+        <List editItem={this.editItem.bind(this)}
+              updateRecord={this.updateRecord.bind(this)}
               deleteRecord={this.deleteRecord.bind(this)}
               items={this.state.items}/>
         <button onClick={this.syncRecords.bind(this)} disabled={disabled}>Sync!</button>

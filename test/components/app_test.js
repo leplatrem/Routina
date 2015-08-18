@@ -42,6 +42,12 @@ describe("App", () => {
       sinon.assert.calledOnce(store.load);
     });
 
+    it("enables autorefresh on load", () => {
+      expect(store.autorefresh).to.be.false;
+      store.emit("change", {items: []});
+      expect(store.autorefresh).to.be.true;
+    });
+
     it("renders items of store when store changes", () => {
       store.emit("change", {items: [new Routine(":)")]});
       let node = React.findDOMNode(rendered);
@@ -100,6 +106,10 @@ describe("App", () => {
         TestUtils.Simulate.click(item);
       });
 
+      it("stops store autorefresh on edit", () => {
+        expect(store.autorefresh).to.be.false;
+      });
+
       it("updates item in the store on edit", () => {
         // Change and submit.
         const field = React.findDOMNode(rendered).querySelector("li > form > input");
@@ -141,18 +151,24 @@ describe("List", () => {
   describe("Editing", () => {
 
     var node;
-    var updateCallback, deleteCallback;
+    var editItemCallback, updateCallback, deleteCallback;
 
     beforeEach(() => {
+      editItemCallback = sinon.spy();
       updateCallback = sinon.spy();
       deleteCallback = sinon.spy();
-      rendered = TestUtils.renderIntoDocument(<List items={items} updateRecord={updateCallback}
+      rendered = TestUtils.renderIntoDocument(<List items={items} editItem={editItemCallback}
+                                                                  updateRecord={updateCallback}
                                                                   deleteRecord={deleteCallback}/>);
       node = React.findDOMNode(rendered);
 
       TestUtils.Simulate.click(node.querySelector("li:first-child button.edit"));
       const field = node.querySelector("li > form > input");
       TestUtils.Simulate.change(field, {target: {value: "Hola, mundo"}});
+    });
+
+    it("uses callback on edit", () => {
+      sinon.assert.calledOnce(editItemCallback);
     });
 
     it("renders as form on item click", () => {

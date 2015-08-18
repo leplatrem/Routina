@@ -19,8 +19,27 @@ export class Store extends EventEmitter {
     return record.serialize();
   }
 
+  set autorefresh(state) {
+    if (state) {
+      if (!this._timer)
+        this._timer = setInterval(this.emitChange.bind(this), 5000);
+    }
+    else if (this._timer) {
+      this._timer = clearInterval(this._timer);
+    }
+  }
+
+  get autorefresh() {
+    return !!this._timer;
+  }
+
   onError(error) {
     this.emit("error", error);
+  }
+
+  emitChange() {
+    const sorted = this.state.items.sort((a, b) => a.timeleft - b.timeleft);
+    this.emit("change", this.state);
   }
 
   load() {
@@ -28,7 +47,7 @@ export class Store extends EventEmitter {
       .then(res => {
         const instances = res.data.map(this.deserialize);
         this.state.items = instances;
-        this.emit("change", this.state);
+        this.emitChange();
       })
       .catch(this.onError.bind(this));
   }
@@ -38,7 +57,7 @@ export class Store extends EventEmitter {
       .then(res => {
         const instance = this.deserialize(res.data);
         this.state.items.push(instance);
-        this.emit("change", this.state);
+        this.emitChange();
       })
       .catch(this.onError.bind(this));
   }
@@ -50,7 +69,7 @@ export class Store extends EventEmitter {
           const instance = this.deserialize(res.data);
           return item.id === record.id ? instance : item;
         });
-        this.emit('change', this.state);
+        this.emitChange();
       })
       .catch(this.onError.bind(this));
   }
@@ -61,7 +80,7 @@ export class Store extends EventEmitter {
         this.state.items = this.state.items.filter(item => {
           return item.id !== record.id;
         });
-        this.emit('change', this.state);
+        this.emitChange();
       })
       .catch(this.onError.bind(this));
   }
