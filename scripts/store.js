@@ -1,5 +1,7 @@
 import { EventEmitter } from "events";
 
+import { Routine } from "./models";
+
 
 export class Store extends EventEmitter {
 
@@ -9,6 +11,14 @@ export class Store extends EventEmitter {
     this.collection = kinto.collection(collection);
   }
 
+  deserialize(data) {
+    return Routine.deserialize(data);
+  }
+
+  serialize(record) {
+    return record.serialize();
+  }
+
   onError(error) {
     this.emit("error", error);
   }
@@ -16,17 +26,42 @@ export class Store extends EventEmitter {
   load() {
     return this.collection.list()
       .then(res => {
-        this.state.items = res.data;
+        const instances = res.data.map(this.deserialize);
+        this.state.items = instances;
         this.emit("change", this.state);
       })
       .catch(this.onError.bind(this));
   }
 
   create(record) {
-    return this.collection.create(record)
+    return this.collection.create(this.serialize(record))
       .then(res => {
-        this.state.items.push(res.data);
+        const instance = this.deserialize(res.data);
+        this.state.items.push(instance);
         this.emit("change", this.state);
+      })
+      .catch(this.onError.bind(this));
+  }
+
+  update(record) {
+    return this.collection.update(this.serialize(record))
+      .then(res => {
+        this.state.items = this.state.items.map(item => {
+          const instance = this.deserialize(res.data);
+          return item.id === record.id ? instance : item;
+        });
+        this.emit('change', this.state);
+      })
+      .catch(this.onError.bind(this));
+  }
+
+  delete(record) {
+    return this.collection.delete(record.id)
+      .then(res => {
+        this.state.items = this.state.items.filter(item => {
+          return item.id !== record.id;
+        });
+        this.emit('change', this.state);
       })
       .catch(this.onError.bind(this));
   }
