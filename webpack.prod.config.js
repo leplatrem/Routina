@@ -2,28 +2,24 @@ var path = require("path");
 var webpack = require("webpack");
 
 module.exports = {
-  devtool: "eval",
-  entry: [
-    "webpack-dev-server/client?http://localhost:3000",
-    "webpack/hot/only-dev-server",
-    path.resolve(__dirname, "scripts/index.js")
-  ],
+  entry: {
+    app: path.resolve(__dirname, "scripts/index.js"),
+    vendors: ["react", "kinto", "moment", "uuid", "bootstrap/less/bootstrap.less"]
+  },
   output: {
     path: path.join(__dirname, "assets"),
     filename: "bundle.js",
     publicPath: "assets/"
   },
   plugins: [
-    new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoErrorsPlugin()
+    new webpack.optimize.CommonsChunkPlugin('vendors', 'vendors.js')
   ],
   resolve: {
     extensions: ["", ".js", ".jsx", ".less"]
   },
   module: {
     loaders: [
-      { test: /\.jsx?$/,   loaders: ["react-hot", "babel"],
-        include: path.join(__dirname, "scripts") },
+      { test: /\.jsx?$/, loaders: ["babel"], include: path.join(__dirname, "scripts") },
       { test: /\.less$/, loader: 'style!css!less' },
       // Font files
       { test: /\.woff2?(\?v=\d+\.\d+\.\d+)?$/, loader: "url?limit=10000&mimetype=application/font-woff" },

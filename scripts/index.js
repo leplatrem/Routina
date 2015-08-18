@@ -1,3 +1,13 @@
+/*
+ * Webpack inclusions.
+ */
+require("bootstrap/less/bootstrap.less");
+require("../styles/fira.less");
+require("../styles/style.less");
+
+/*
+ * Routina.
+ */
 import "babel/polyfill";
 import btoa from "btoa";
 import { v4 as uuid4 } from "uuid";
