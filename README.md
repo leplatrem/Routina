@@ -7,6 +7,10 @@
 **Routina** is a *todo list* where the tasks have a period and are
 automatically rescheduled when marked as done.
 
+It works offline.
+
+You can use it [in your browser](https://leplatrem.github.io/Routina/) or [install it as an app](https://leplatrem.github.io/Routina/install.html) (*Firefox Desktop/Android/OS*)!
+
 ![screenshot](screenshots/screenshot-1.png)
 
 ## Roadmap
