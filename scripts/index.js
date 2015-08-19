@@ -2,7 +2,6 @@
  * Webpack inclusions.
  */
 require("bootstrap/less/bootstrap.less");
-require("../styles/fira.less");
 require("../styles/main.less");
 
 /*

@@ -231,7 +231,8 @@ export default class App extends React.Component {
     const syncLabel = this.state.online ? (busy ? "Syncing..." : "Sync") : "Offline";
 
     return (
-      <section className={busy ? "disabled" : ""}>
+      <section>
+        {busy ? <div className="loader"></div> : ""}
         <div className="error">{this.state.error}</div>
         <List editItem={this.editItem.bind(this)}
               updateRecord={this.updateRecord.bind(this)}

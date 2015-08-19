@@ -20,8 +20,13 @@ export class Store extends EventEmitter {
   }
 
   set online(state) {
+    const changed = (this.state.online !== state);
     this.state.online = state;
-    this.emit("online", state);
+    if (changed) this.emit("online", state);
+
+    if (changed && state && this.autorefresh) {
+      this.sync();
+    }
   }
 
   get online () {
@@ -29,8 +34,9 @@ export class Store extends EventEmitter {
   }
 
   set busy(state) {
+    const changed = (this.state.busy !== state);
     this.state.busy = state;
-    this.emit("busy", state);
+    if (changed) this.emit("busy", state);
   }
 
   get busy () {
@@ -56,9 +62,13 @@ export class Store extends EventEmitter {
     this.emit("error", error);
   }
 
-  emitChange() {
+  emitChange(options={autosync: false}) {
     const sorted = this.state.items.sort((a, b) => a.timeleft - b.timeleft);
     this.emit("change", this.state);
+
+    if (options.autosync && this.autorefresh) {
+      this.sync();
+    }
   }
 
   load() {
@@ -76,7 +86,7 @@ export class Store extends EventEmitter {
       .then(res => {
         const instance = this.deserialize(res.data);
         this.state.items.push(instance);
-        this.emitChange();
+        this.emitChange({autosync: true});
       })
       .catch(this.onError.bind(this));
   }
@@ -88,7 +98,7 @@ export class Store extends EventEmitter {
           const instance = this.deserialize(res.data);
           return item.id === record.id ? instance : item;
         });
-        this.emitChange();
+        this.emitChange({autosync: true});
       })
       .catch(this.onError.bind(this));
   }
@@ -99,7 +109,7 @@ export class Store extends EventEmitter {
         this.state.items = this.state.items.filter(item => {
           return item.id !== record.id;
         });
-        this.emitChange();
+        this.emitChange({autosync: true});
       })
       .catch(this.onError.bind(this));
   }
@@ -108,12 +118,17 @@ export class Store extends EventEmitter {
     if (!this.state.online) {
       return;
     }
+    if (this.state.busy) {
+      // XXX: re-schedule another sync.
+      return;
+    }
 
     this.busy = true;
     return this.collection.sync()
       .then((res) => {
+        this.busy = false;
+
         if (res.ok) {
-          this.busy = false;
           return this.load();
         }
 

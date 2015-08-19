@@ -74,6 +74,20 @@ describe("Store", () => {
       });
       store.create(new Routine());
     });
+
+    it("syncs if online and autorefresh", (done) => {
+      sandbox.stub(store.collection, "sync")
+        .returns(Promise.resolve({ok: true}));
+      store.autorefresh = store.online = true;
+
+      store.create(new Routine());
+      store.on('busy', state => {
+        if (!state) {
+          sinon.assert.calledOnce(store.collection.sync);
+          done();
+        }
+      });
+    });
   });
 
 
@@ -81,9 +95,12 @@ describe("Store", () => {
 
     const existing = {id: 1, label: "from db"};
 
-    it("update() replaces with Kinto record and emits change", (done) => {
+    beforeEach(() => {
       sandbox.stub(store.collection, 'update')
         .returns(Promise.resolve({data: existing}));
+    });
+
+    it("update() replaces with Kinto record and emits change", (done) => {
       store.on('change', event => {
         expect(event.items).to.eql([Routine.deserialize(existing)]);
         done();
@@ -92,19 +109,49 @@ describe("Store", () => {
       const updated = Routine.deserialize({id: 1, label: "Mundo"});
       store.update(updated);
     });
+
+    it("syncs if online and autorefresh", (done) => {
+      sandbox.stub(store.collection, "sync")
+        .returns(Promise.resolve({ok: true}));
+      store.autorefresh = store.online = true;
+
+      store.update(new Routine());
+      store.on('busy', state => {
+        if (!state) {
+          sinon.assert.calledOnce(store.collection.sync);
+          done();
+        }
+      });
+    });
   });
 
 
   describe("#delete()", () => {
-
-    it("removes record and emits change", (done) => {
+    beforeEach(() => {
       sandbox.stub(store.collection, "delete")
         .returns(Promise.resolve({}));
+    });
+
+    it("removes record and emits change", (done) => {
       store.on('change', event => {
         expect(event.items).to.eql([]);
         done();
       });
       store.delete({id: 1, label: "Mundo"});
+    });
+
+    it("syncs if online and autorefresh", (done) => {
+      sandbox.stub(store.collection, "sync")
+        .returns(Promise.resolve({ok: true}));
+      store.autorefresh = store.online = true;
+
+      store.delete({id: 1, label: "Mundo"});
+      store.on('busy', state => {
+        if (!state) {
+          sinon.assert.calledOnce(store.collection.sync);
+          done();
+        }
+      });
     });
   });
 
@@ -167,6 +214,12 @@ describe("Store", () => {
       var result = store.sync();
       expect(result).to.not.exist;
     });
+
+    it("does nothing while busy", () => {
+      store.busy = true;
+      var result = store.sync();
+      expect(result).to.not.exist;
+    });
   });
 
 
@@ -175,11 +228,27 @@ describe("Store", () => {
       expect(store.online).to.be.true;
     });
 
-    it("is sends an event when going offline", () => {
+    it("sends an event when going offline", () => {
       var callback = sinon.spy();
       store.on("online", callback);
       store.online = false;
       sinon.assert.calledOnce(callback);
+    });
+
+    it("sends an event only when state changes", () => {
+      var callback = sinon.spy();
+      store.on("online", callback);
+      store.online = false;
+      store.online = false;
+      sinon.assert.calledOnce(callback);
+    });
+
+    it("is syncs when coming back online", () => {
+      sinon.stub(store, "sync");
+      store.autorefresh = true;
+      store.online = false;
+      store.online = true;
+      sinon.assert.calledOnce(store.sync);
     });
   });
 

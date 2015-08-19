@@ -70,9 +70,15 @@ describe("App", () => {
         sinon.assert.calledOnce(store.sync);
       });
 
+      it("shows loader while store is busy", () => {
+        store.emit("busy", true);
+        const node = React.findDOMNode(rendered);
+        expect(node.querySelector(".loader")).to.exist;
+      });
+
       it("disables button while store is busy", () => {
         store.emit("busy", true);
-        const selector = ".disabled button.sync[disabled]";
+        const selector = "button.sync[disabled]";
         const node = React.findDOMNode(rendered);
         expect(node.querySelector(selector)).to.exist;
         store.emit("busy", false);

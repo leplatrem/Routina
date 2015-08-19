@@ -1,54 +1,14 @@
-/**
- * Variables
- */
-
-@font: Fira Sans;
-@disabled: GrayText;
-@error: red;
-@annotation: #888;
-@decoration: #ddd;
-
-@spacing: 4px;
-
-@ok: green;
-@warning: #ffd800;
-@overdue: #FF7E00;
-@critical: #d70000;
+@import "./fira.less";
+@import "./loader.less";
 
 
 /**
- * Macros
+ * Utils
  */
 
-.status (@color) {
-  box-shadow: inset 4px 0 0 0 @color;
-  background-color: fadeout(@color, 80%);
-  color: @color;
-}
-
-
-/**
- * Style
- */
-
-html, body {
-  width: 100%;
-  padding: 0px;
-  margin-bottom: @spacing;
-  font-family: @font;
-}
-
-.btn.default {
-  background-color: transparent;
-  border-color: @decoration;
-}
-
-.disabled {
-  color: @disabled;
-}
-
-.error {
-  color: @error;
+.nopad {
+  padding-left: 0px;
+  padding-right: 0px;
 }
 
 .hbox {
@@ -65,17 +25,54 @@ html, body {
   }
 }
 
-.nopad {
-  padding-left: 0px;
-  padding-right: 0px;
-}
-
 .fit {
   flex-grow: 1;
 }
 
 .pull-end {
   margin-left: auto;
+}
+
+
+/*
+ * Routina style.
+ */
+
+@font: Fira Sans;
+@error: red;
+@annotation: #888;
+@decoration: #ddd;
+
+@spacing: 4px;
+
+@ok: green;
+@warning: #ffd800;
+@overdue: #FF7E00;
+@critical: #d70000;
+
+
+/* Check button Less macro */
+.status (@color) {
+  box-shadow: inset 4px 0 0 0 @color;
+  background-color: fadeout(@color, 80%);
+  color: @color;
+}
+
+
+html, body {
+  width: 100%;
+  padding: 0px;
+  margin-bottom: @spacing;
+  font-family: @font;
+}
+
+.btn.default {
+  background-color: transparent;
+  border-color: @decoration;
+}
+
+.error {
+  color: @error;
 }
 
 li {
