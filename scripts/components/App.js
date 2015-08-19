@@ -182,13 +182,16 @@ export default class App extends React.Component {
     this.props.store.on("online", state => {
       this.setState({online: state});
     });
+    this.props.store.on("busy", state => {
+      this.setState({busy: state});
+    });
     this.props.store.on("change", state => {
       this.props.store.autorefresh = true;
-      this.setState(Object.assign({busy: false}, state));
+      this.setState(state);
     });
     this.props.store.on("error", error => {
       this.props.store.autorefresh = true;
-      this.setState({busy: false, error: error.message});
+      this.setState({error: error.message});
     });
 
     this.props.store.load();
@@ -215,7 +218,7 @@ export default class App extends React.Component {
   }
 
   syncRecords() {
-    this.setState({busy: true, error: ""});
+    this.setState({error: ""});
     this.props.store.sync();
   }
 

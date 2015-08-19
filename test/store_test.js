@@ -120,6 +120,16 @@ describe("Store", () => {
         .returns(Promise.resolve({data: [existing]}));
     });
 
+    it("emits busy when sync starts and stops", (done) => {
+      var callback = sinon.spy();
+      store.on("busy", callback);
+      store.sync()
+        .then(() => {
+          sinon.assert.calledTwice(callback);
+          done();
+        });
+    });
+
     it("reloads the local db after sync if ok", (done) => {
       store.on("change", event => {
         expect(event.items).to.eql([Routine.deserialize(existing)]);
