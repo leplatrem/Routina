@@ -7,7 +7,7 @@ export class Store extends EventEmitter {
 
   constructor(kinto, collection) {
     super();
-    this.state = {items: []};
+    this.state = {items: [], online: true};
     this.collection = kinto.collection(collection);
   }
 
@@ -17,6 +17,15 @@ export class Store extends EventEmitter {
 
   serialize(record) {
     return record.serialize();
+  }
+
+  set online(state) {
+    this.state.online = state;
+    this.emit("online", state);
+  }
+
+  get online () {
+    return this.state.online;
   }
 
   set autorefresh(state) {
@@ -86,6 +95,10 @@ export class Store extends EventEmitter {
   }
 
   sync() {
+    if (!this.state.online) {
+      return;
+    }
+
     return this.collection.sync()
       .then((res) => {
         if (res.ok) {

@@ -69,7 +69,7 @@ describe("Store", () => {
 
     it("adds Kinto record to its state and emits change", (done) => {
       store.on("change", event => {
-        expect(event).to.eql({items: [Routine.deserialize(sample), Routine.deserialize(sample)]});
+        expect(event.items).to.eql([Routine.deserialize(sample), Routine.deserialize(sample)]);
         done();
       });
       store.create(new Routine());
@@ -85,7 +85,7 @@ describe("Store", () => {
       sandbox.stub(store.collection, 'update')
         .returns(Promise.resolve({data: existing}));
       store.on('change', event => {
-        expect(event).to.eql({items: [Routine.deserialize(existing)]});
+        expect(event.items).to.eql([Routine.deserialize(existing)]);
         done();
       });
 
@@ -101,7 +101,7 @@ describe("Store", () => {
       sandbox.stub(store.collection, "delete")
         .returns(Promise.resolve({}));
       store.on('change', event => {
-        expect(event).to.eql({items: []});
+        expect(event.items).to.eql([]);
         done();
       });
       store.delete({id: 1, label: "Mundo"});
@@ -122,7 +122,7 @@ describe("Store", () => {
 
     it("reloads the local db after sync if ok", (done) => {
       store.on("change", event => {
-        expect(event).to.eql({items: [Routine.deserialize(existing)]});
+        expect(event.items).to.eql([Routine.deserialize(existing)]);
         done();
       });
       store.sync();
@@ -150,6 +150,26 @@ describe("Store", () => {
         done();
       });
       store.sync();
+    });
+
+    it("does nothing while offline", () => {
+      store.online = false;
+      var result = store.sync();
+      expect(result).to.not.exist;
+    });
+  });
+
+
+  describe("Online", () => {
+    it("is online by default", () => {
+      expect(store.online).to.be.true;
+    });
+
+    it("is sends an event when going offline", () => {
+      var callback = sinon.spy();
+      store.on("online", callback);
+      store.online = false;
+      sinon.assert.calledOnce(callback);
     });
   });
 

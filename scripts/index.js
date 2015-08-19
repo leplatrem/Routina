@@ -31,6 +31,9 @@ const auth = "Basic " + userpass64;
 const kinto = new Kinto({remote: server, headers: {Authorization: auth}});
 
 const store = new Store(kinto, "routina-v1");
+store.online = window.navigator.onLine;
+window.addEventListener("offline", () => {store.online = false;});
+window.addEventListener("online", () => {store.online = true;});
 
 // Make sure local data depend on current user.
 // Note: Kinto.js will have an option: https://github.com/Kinto/kinto.js/pull/111

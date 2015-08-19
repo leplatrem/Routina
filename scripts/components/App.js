@@ -178,6 +178,10 @@ export default class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = this.props.store.state;
+
+    this.props.store.on("online", state => {
+      this.setState({online: state});
+    });
     this.props.store.on("change", state => {
       this.props.store.autorefresh = true;
       this.setState(Object.assign({busy: false}, state));
@@ -216,9 +220,15 @@ export default class App extends React.Component {
   }
 
   render() {
-    var disabled = this.state.busy ? "disabled" : "";
+    const busy = this.state.busy;
+    const online = this.state.online;
+
+    const syncDisabled = (busy || !online) ? "disabled" : "";
+    const syncIcon = this.state.online ? (busy ? "refresh" : "cloud-upload") : "alert";
+    const syncLabel = this.state.online ? (busy ? "Syncing..." : "Sync") : "Offline";
+
     return (
-      <section className={disabled}>
+      <section className={busy ? "disabled" : ""}>
         <div className="error">{this.state.error}</div>
         <List editItem={this.editItem.bind(this)}
               updateRecord={this.updateRecord.bind(this)}
@@ -227,10 +237,10 @@ export default class App extends React.Component {
         <div className="hbox create">
           <Form saveRecord={this.createRecord.bind(this)}/>
         </div>
-        <div className="hbox">
-          <button className="btn default sync fit" data-icon="sync" onClick={this.syncRecords.bind(this)} disabled={disabled}>
-            <span className="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span>
-            &nbsp;Sync
+        <div className="hbox sync">
+          <button className="btn default fit sync" data-icon="sync" onClick={this.syncRecords.bind(this)} disabled={syncDisabled}>
+            <span className={"glyphicon glyphicon-" + syncIcon} aria-hidden="true"></span>
+            &nbsp;{syncLabel}
           </button>
           <a href={"https://leplatrem.github.io/Routina/#" + this.props.user}>
             <span className="glyphicon glyphicon-link" aria-hidden="true"></span>

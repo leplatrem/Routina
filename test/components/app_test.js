@@ -62,32 +62,42 @@ describe("App", () => {
       expect(createArg.label).to.eql("Hello, world");
     });
 
-    it("syncs store on button click", () => {
-      const node = React.findDOMNode(rendered).querySelector("button.sync");
-      TestUtils.Simulate.click(node);
-      sinon.assert.calledOnce(store.sync);
-    });
 
-    it("disables button during sync", () => {
-      rendered.syncRecords();
-      let selector = ".disabled button.sync[disabled]";
-      let node = React.findDOMNode(rendered);
-      expect(node.querySelector(selector)).to.exist;
-      store.emit("change", {});
-      expect(node.querySelector(selector)).to.not.exist;
-    });
+    describe("Sync", () => {
+      it("syncs store on button click", () => {
+        const node = React.findDOMNode(rendered).querySelector("button.sync");
+        TestUtils.Simulate.click(node);
+        sinon.assert.calledOnce(store.sync);
+      });
 
-    it("shows message when error happens", () => {
-      store.emit("error", new Error("Failed"));
-      let node = React.findDOMNode(rendered);
-      expect(node.querySelector(".error").textContent).to.eql("Failed");
-    });
+      it("disables button during sync", () => {
+        rendered.syncRecords();
+        const selector = ".disabled button.sync[disabled]";
+        const node = React.findDOMNode(rendered);
+        expect(node.querySelector(selector)).to.exist;
+        store.emit("change", {});
+        expect(node.querySelector(selector)).to.not.exist;
+      });
 
-    it("clears error message on sync", () => {
-      store.emit("error", new Error("Failed"));
-      rendered.syncRecords();
-      let node = React.findDOMNode(rendered);
-      expect(node.querySelector(".error").textContent).to.eql("");
+      it("changes button label and icon during sync", () => {
+        rendered.syncRecords();
+        const node = React.findDOMNode(rendered).querySelector("button.sync");
+        expect(node.textContent).to.contain("Syncing...");
+        expect(node.querySelector(".glyphicon-refresh")).to.exist;
+      });
+
+      it("shows message when error happens", () => {
+        store.emit("error", new Error("Failed"));
+        const node = React.findDOMNode(rendered);
+        expect(node.querySelector(".error").textContent).to.eql("Failed");
+      });
+
+      it("clears error message on sync", () => {
+        store.emit("error", new Error("Failed"));
+        rendered.syncRecords();
+        const node = React.findDOMNode(rendered);
+        expect(node.querySelector(".error").textContent).to.eql("");
+      });
     });
 
 
@@ -107,7 +117,26 @@ describe("App", () => {
         var selector = "a[href='https://leplatrem.github.io/Routina/#" + user + "']"
         expect(node.querySelectorAll(selector).length).to.eql(1);
       })
-    })
+    });
+
+
+    describe("Offline", () => {
+      beforeEach(() => {
+        store.online = false;
+      });
+
+      it("disables the button while offline", () => {
+        const selector = "button.sync[disabled]";
+        const node = React.findDOMNode(rendered);
+        expect(node.querySelector(selector)).to.exist;
+      });
+
+      it("shows a warning while offline", () => {
+        const node = React.findDOMNode(rendered).querySelector("button.sync");
+        expect(node.textContent).to.contain("Offline");
+        expect(node.querySelector(".glyphicon-alert")).to.exist;
+      });
+    });
 
 
     describe("Editing", () => {
