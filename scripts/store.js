@@ -7,7 +7,7 @@ export class Store extends EventEmitter {
 
   constructor(kinto, collection) {
     super();
-    this.state = {items: [], online: true};
+    this.state = {items: [], online: true, busy: false};
     this.collection = kinto.collection(collection);
   }
 
@@ -28,6 +28,15 @@ export class Store extends EventEmitter {
     return this.state.online;
   }
 
+  set busy(state) {
+    this.state.busy = state;
+    this.emit("busy", state);
+  }
+
+  get busy () {
+    return this.state.busy;
+  }
+
   set autorefresh(state) {
     if (state) {
       if (!this._timer)
@@ -43,6 +52,7 @@ export class Store extends EventEmitter {
   }
 
   onError(error) {
+    this.busy = false;
     this.emit("error", error);
   }
 
@@ -99,9 +109,11 @@ export class Store extends EventEmitter {
       return;
     }
 
+    this.busy = true;
     return this.collection.sync()
       .then((res) => {
         if (res.ok) {
+          this.busy = false;
           return this.load();
         }
 

@@ -70,17 +70,17 @@ describe("App", () => {
         sinon.assert.calledOnce(store.sync);
       });
 
-      it("disables button during sync", () => {
-        rendered.syncRecords();
+      it("disables button while store is busy", () => {
+        store.emit("busy", true);
         const selector = ".disabled button.sync[disabled]";
         const node = React.findDOMNode(rendered);
         expect(node.querySelector(selector)).to.exist;
-        store.emit("change", {});
+        store.emit("busy", false);
         expect(node.querySelector(selector)).to.not.exist;
       });
 
-      it("changes button label and icon during sync", () => {
-        rendered.syncRecords();
+      it("changes button label and icon while store is busy", () => {
+        store.emit("busy", true);
         const node = React.findDOMNode(rendered).querySelector("button.sync");
         expect(node.textContent).to.contain("Syncing...");
         expect(node.querySelector(".glyphicon-refresh")).to.exist;
