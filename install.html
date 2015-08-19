@@ -1,17 +1,76 @@
 <html>
+  <head>
+    <title>Routina - Installation</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="https://gaia-components.github.io/gaia-icons/gaia-icons-embedded.css">
+    <style>
+      #screenshot {
+        max-height: 350px;
+        overflow: hidden;
+      }
+    </style>
+  </head>
   <body>
-    <h1>Routina</h1>
-    <p>Installation page tested on Firefox (Desktop, Android, FirefoxOS)</p>
+    <div class="jumbotron">
+      <div class="container">
+        <div id="screenshot" class="pull-right">
+          <img src="https://rawgit.com/leplatrem/Routina/master/screenshots/screenshot-1.png" alt="" class="img-rounded">
+        </div>
+        <h1>Routina</h1>
+        <p>Periodical tasks, rescheduled when checked.</p>
+        <p>
+          <button class="btn btn-info btn-lg" href="/" role="button">
+            Open in browser
+          </button>
+          &mdash; or &mdash;
+          <button class="btn btn-primary btn-lg" href="#" role="button" onclick="javascript:install();">
+            <span data-icon="firefox"></span> Install via Firefox&raquo;
+          </button>
+        </p>
+      </div>
+    </div>
+    <div class="container">
+      <!-- Example row of columns -->
+      <div class="row">
+        <div class="col-md-6">
+          <h2>Motivations</h2>
+          <p>
+            <ul>
+              <li>Offline-first</li>
+              <li><a href="https://developer.mozilla.org/en-US/Apps/Quickstart/Build/Intro_to_open_web_apps">Open Web app</a></li>
+              <li>Use <a href="http://kintojs.readthedocs.org">kinto.js</a> in a real world app</li>
+              <li>Fully tested stack <a href="https://github.com/Kinto/kinto-react-boilerplate">React+Karma+WebPack</a></li>
+            </ul>
+          </p>
+          <p><a class="btn btn-default" href="https://github.com/leplatrem/Routina/" role="button">Source code &raquo;</a></p>
+        </div>
+        <div class="col-md-6">
+          <h2>Mozilla Kinto</h2>
+          <p>Kinto is a lightweight JSON storage service, with synchronisation and sharing
+          abilities.</p>
+          <p><a class="btn btn-default" href="http://kinto.readthedocs.org" role="button">View details &raquo;</a></p>
+       </div>
+      </div>
+
+      <hr>
+
+      <footer>
+        <p>&copy; Mathieu Leplatre</p>
+      </footer>
+    </div>
     <script>
-      // This URL must be a full url.
-      var manifestUrl = 'https://leplatrem.github.io/Routina/install.webapp';
-      var req = navigator.mozApps.installPackage(manifestUrl);
-      req.onsuccess = function() {
-        alert(this.result.origin);
-      };
-      req.onerror = function() {
-        alert(this.error.name);
-      };
+      function install() {
+        // This URL must be a full url.
+        var manifestUrl = 'https://leplatrem.github.io/Routina/install.webapp';
+        var req = navigator.mozApps.installPackage(manifestUrl);
+        req.onsuccess = function() {
+          alert(this.result.origin);
+        };
+        req.onerror = function() {
+          alert(this.error.name);
+        }
+      }
     </script>
   </body>
 </html>
