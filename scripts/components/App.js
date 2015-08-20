@@ -13,7 +13,7 @@ export class Form extends React.Component {
   }
 
   newRoutine() {
-    return new Routine("New task", {value: 3, unit: "days"});
+    return new Routine("", {value: 3, unit: "days"});
   }
 
   onFormSubmit(event) {
@@ -42,7 +42,7 @@ export class Form extends React.Component {
     return (
       <form onSubmit={this.onFormSubmit.bind(this)} className="form-inline fit hbox">
         <input autofocus name="label" type="text"
-               placeholder="Label"
+               placeholder="New habit"
                value={record.label}
                onChange={this.onChange.bind(this, "label")}
                className="form-control fit" />
