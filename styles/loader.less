@@ -1,0 +1,33 @@
+/*
+ * source: http://codepen.io/brunjo/pen/XJmbNz
+ */
+@height: 3px;
+@color: #2980b9;
+
+.loader {
+  height: 4px;
+  width: 100%;
+  position: fixed;
+  overflow: hidden;
+  background-color: #ddd;
+  z-index: 999;
+
+   &:before{
+    display: block;
+    position: absolute;
+    content: "";
+    left: -200px;
+    width: 200px;
+    height: 4px;
+    background-color: @color;
+    animation: loading 2s linear infinite;
+  }
+}
+@keyframes loading {
+    from {left: -200px; width: 30%;}
+    50% {width: 30%;}
+    70% {width: 70%;}
+    80% { left: 50%;}
+    95% {left: 120%;}
+    to {left: 100%;}
+}
