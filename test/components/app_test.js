@@ -398,12 +398,12 @@ describe("Form", () => {
 
   it("sets placeholder if no record", () => {
     const button = React.findDOMNode(rendered).querySelector("input");
-    expect(button.placeholder).to.equal("Label");
+    expect(button.placeholder).to.equal("New habit");
   });
 
   it("contains an fields with default values and a submit button", () => {
     const node = React.findDOMNode(rendered);
-    expect(node.querySelector("input[name='label']").value).to.eql("New task");
+    expect(node.querySelector("input[name='label']").value).to.eql("");
     expect(node.querySelector("input[name='value']").value).to.eql("3");
     expect(node.querySelector("select[name='unit']").value).to.eql("days");
   });
@@ -472,7 +472,7 @@ describe("Form", () => {
     it("clears form on submit", () => {
       const node = React.findDOMNode(rendered);
       TestUtils.Simulate.submit(node);
-      expect(rendered.state.record.label).to.equal("New task");
+      expect(rendered.state.record.label).to.equal("");
     });
   });
 });
