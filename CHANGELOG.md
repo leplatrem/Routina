@@ -2,9 +2,23 @@
 
 ## [Unreleased](https://github.com/leplatrem/Routina/tree/HEAD)
 
-[Full Changelog](https://github.com/leplatrem/Routina/compare/1.0...HEAD)
+[Full Changelog](https://github.com/leplatrem/Routina/compare/1.1...HEAD)
 
 Nothing changed yet.
+
+## [1.1](https://github.com/leplatrem/Routina/tree/1.1) (2015-08-20)
+
+**New features**
+
+- Show permalink to ease sharing of lists [\#19](https://github.com/leplatrem/Routina/pulls/19)
+- Add weeks period [\#21](https://github.com/leplatrem/Routina/pulls/21)
+- Auto-detect online/offline status [\#22](https://github.com/leplatrem/Routina/pulls/22)
+- Auto-sync while online [\#24](https://github.com/leplatrem/Routina/pulls/24)
+
+**Bug fixes**
+
+- Fixes in development environment [\#18](https://github.com/leplatrem/Routina/pulls/18)
+- Minor fixes in margins and apparence [\#18](https://github.com/leplatrem/Routina/pulls/18)
 
 ## [1.0](https://github.com/leplatrem/Routina/tree/1.0) (2015-08-18)
 
