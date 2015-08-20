@@ -1,9 +1,9 @@
 {
     "name": "Routina",
     "package_path" : "https://leplatrem.github.io/Routina/routina.zip",
-    "version": "1.0",
-    "size": 1364802,
-    "release_notes": "First release",
+    "version": "1.1",
+    "size": 1365442,
+    "release_notes": "Polished version",
     "developer": {
         "name": "Mathieu Leplatre",
         "url": "http://mathieu-leplatre.info"
