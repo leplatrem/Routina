@@ -179,11 +179,18 @@ export default class App extends React.Component {
     super(props);
     this.state = this.props.store.state;
 
+    this.props.store.load();
+    if (this.props.user) {
+      this.syncRecords();
+    }
+  }
+
+  componentDidMount() {
     this.props.store.on("online", state => {
       this.setState({online: state});
     });
     this.props.store.on("busy", state => {
-      this.setState({busy: state});
+      this.setState(Object.assign({busy: state}, state ? {error: ""} : {}));
     });
     this.props.store.on("change", state => {
       this.props.store.autorefresh = true;
@@ -193,11 +200,22 @@ export default class App extends React.Component {
       this.props.store.autorefresh = true;
       this.setState({error: error.message});
     });
+  }
 
-    this.props.store.load();
-    if (this.props.user) {
-      this.syncRecords();
-    }
+  addSamples() {
+    const samples = [
+      new Routine("Smile",             {value: 40, unit: "seconds"}),
+      new Routine("Stretch neck",      {value: 2,  unit: "hours"}),
+      new Routine("Call mum",          {value: 5,  unit: "days"}),
+      new Routine("Gym",               {value: 1,  unit: "weeks"}),
+      new Routine("Eat cheesecake",    {value: 3,  unit: "weeks"}),
+      new Routine("Change bed sheets", {value: 15, unit: "days"}),
+      new Routine("Periods",           {value: 28, unit: "days"}),
+      new Routine("Water cactus",      {value: 8,  unit: "weeks"}),
+      new Routine("Visit dentist",     {value: 6,  unit: "months"}),
+      new Routine("Tree blossom",      {value: 1,  unit: "years"}),
+    ];
+    samples.map(this.createRecord.bind(this));
   }
 
   editItem() {
@@ -218,7 +236,6 @@ export default class App extends React.Component {
   }
 
   syncRecords() {
-    this.setState({error: ""});
     this.props.store.sync();
   }
 
@@ -234,10 +251,16 @@ export default class App extends React.Component {
       <section>
         {busy ? <div className="loader"></div> : ""}
         <div className="error">{this.state.error}</div>
-        <List editItem={this.editItem.bind(this)}
-              updateRecord={this.updateRecord.bind(this)}
-              deleteRecord={this.deleteRecord.bind(this)}
-              items={this.state.items}/>
+        { (this.state.items.length > 0 || busy) ?
+          <List editItem={this.editItem.bind(this)}
+                updateRecord={this.updateRecord.bind(this)}
+                deleteRecord={this.deleteRecord.bind(this)}
+                items={this.state.items}/> :
+          <div className="samples">
+            <h1>No items found.</h1>
+            <button className="btn btn-primary" onClick={this.addSamples.bind(this)}>Add samples</button>
+          </div>
+        }
         <div className="hbox create">
           <Form saveRecord={this.createRecord.bind(this)}/>
         </div>

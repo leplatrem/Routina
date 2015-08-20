@@ -63,6 +63,25 @@ describe("App", () => {
     });
 
 
+    describe("Load samples", () => {
+      beforeEach(() => {
+        store.emit("change", {items: []});
+      });
+
+      it("show load samples button if empty", () => {
+        let node = React.findDOMNode(rendered);
+        expect(node.querySelector(".samples .btn")).to.exist;
+      });
+
+      it("load samples on click", () => {
+        sinon.stub(rendered, "createRecord");
+        const node = React.findDOMNode(rendered).querySelector(".samples .btn");
+        TestUtils.Simulate.click(node);
+        expect(rendered.createRecord.callCount).to.eql(10);
+      });
+    });
+
+
     describe("Sync", () => {
       it("syncs store on button click", () => {
         const node = React.findDOMNode(rendered).querySelector("button.sync");
@@ -98,9 +117,9 @@ describe("App", () => {
         expect(node.querySelector(".error").textContent).to.eql("Failed");
       });
 
-      it("clears error message on sync", () => {
+      it("clears error message when store is busy", () => {
         store.emit("error", new Error("Failed"));
-        rendered.syncRecords();
+        store.emit("busy", true);
         const node = React.findDOMNode(rendered);
         expect(node.querySelector(".error").textContent).to.eql("");
       });
@@ -322,7 +341,6 @@ describe("Item", () => {
     node = React.findDOMNode(rendered);
     expect(node.querySelector(".next").textContent).to.contain("late");
   });
-
 
   it("uses callback on edit", () => {
     var callback = sinon.spy();
