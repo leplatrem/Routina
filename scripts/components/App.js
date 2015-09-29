@@ -180,7 +180,7 @@ export default class App extends React.Component {
     this.state = this.props.store.state;
 
     this.props.store.load();
-    if (this.props.user) {
+    if (this.props.auth) {
       this.syncRecords();
     }
   }
@@ -247,6 +247,26 @@ export default class App extends React.Component {
     const syncIcon = this.state.online ? (busy ? "refresh" : "cloud-upload") : "alert";
     const syncLabel = this.state.online ? (busy ? "Syncing..." : "Sync") : "Offline";
 
+    var signIn = '';
+    if (this.props.auth) {
+      if (!this.props.auth.authenticated) {
+        signIn = (
+          <a className="btn default fit signin" href={this.props.auth.loginURI(window.location.href)}>
+            <span className="glyphicon glyphicon-user" aria-hidden="true"></span>
+            Sign in
+          </a>
+        );
+      }
+      if (this.props.auth.token) {
+        signIn = (
+          <a href={"https://leplatrem.github.io/Routina/#" + this.props.auth.token}>
+            <span className="glyphicon glyphicon-link" aria-hidden="true"></span>
+            Permalink
+          </a>
+        );
+      }
+    }
+
     return (
       <section>
         {busy ? <div className="loader"></div> : ""}
@@ -269,10 +289,7 @@ export default class App extends React.Component {
             <span className={"glyphicon glyphicon-" + syncIcon} aria-hidden="true"></span>
             &nbsp;{syncLabel}
           </button>
-          <a href={"https://leplatrem.github.io/Routina/#" + this.props.user}>
-            <span className="glyphicon glyphicon-link" aria-hidden="true"></span>
-            Permalink
-          </a>
+          {signIn}
         </div>
       </section>
     );
