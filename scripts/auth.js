@@ -35,6 +35,7 @@ export class Auth extends EventEmitter {
       this.headers.Authorization = 'Bearer ' + bearerToken;
       this.authenticated = true;
       this.token = '';  // Forget token.
+      this.userid = '';  // XXX: fetch from profile server.
     }
     else {
       // Token provided via hash, but no FxA.

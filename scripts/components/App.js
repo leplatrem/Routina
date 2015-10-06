@@ -248,6 +248,7 @@ export default class App extends React.Component {
     const syncLabel = this.state.online ? (busy ? "Syncing..." : "Sync") : "Offline";
 
     var signIn = '';
+    var permaLink = '';
     if (this.props.auth) {
       if (!this.props.auth.authenticated) {
         signIn = (
@@ -258,8 +259,8 @@ export default class App extends React.Component {
         );
       }
       if (this.props.auth.token) {
-        signIn = (
-          <a href={"https://leplatrem.github.io/Routina/#" + this.props.auth.token}>
+        permaLink = (
+          <a className="fit" href={"https://leplatrem.github.io/Routina/#" + this.props.auth.token}>
             <span className="glyphicon glyphicon-link" aria-hidden="true"></span>
             Permalink
           </a>
@@ -289,6 +290,7 @@ export default class App extends React.Component {
             <span className={"glyphicon glyphicon-" + syncIcon} aria-hidden="true"></span>
             &nbsp;{syncLabel}
           </button>
+          {permaLink}
           {signIn}
         </div>
       </section>

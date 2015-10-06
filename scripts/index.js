@@ -16,12 +16,16 @@ import Kinto from "kinto";
 
 const server = "https://kinto.dev.mozaws.net/v1";
 
+// Migrate from Routina v1.1.
+window.localStorage.setItem("lastuser", window.localStorage.getItem("lastuser"));
+
+// Authenticate using location hash.
 const auth = new Auth(server, window.localStorage);
 auth.authenticate(window.location.hash.slice(1));
 window.location.hash = auth.token;
 
 const headers = Object.assign({}, auth.headers);
-const kinto = new Kinto({remote: server, dbPrefix: auth.token, headers: headers});
+const kinto = new Kinto({remote: server, dbPrefix: auth.userid, headers: headers});
 
 const store = new Store(kinto, "routina-v1");
 store.online = window.navigator.onLine;
