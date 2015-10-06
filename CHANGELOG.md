@@ -2,9 +2,21 @@
 
 ## [Unreleased](https://github.com/leplatrem/Routina/tree/HEAD)
 
-[Full Changelog](https://github.com/leplatrem/Routina/compare/1.1...HEAD)
+[Full Changelog](https://github.com/leplatrem/Routina/compare/1.2...HEAD)
 
 Nothing changed yet.
+
+## [1.2](https://github.com/leplatrem/Routina/tree/1.1) (2015-10-06)
+
+**New features**
+
+- Add link to allow authentication on Firefox OS [\#30](https://github.com/leplatrem/Routina/pulls/30)
+- Offer to load samples when list is empty [\#26](https://github.com/leplatrem/Routina/pulls/26)
+
+**Bug fixes**
+
+- Fix form fields placeholders [\#25](https://github.com/leplatrem/Routina/pulls/25)
+- Fix loader apparence and width
 
 ## [1.1](https://github.com/leplatrem/Routina/tree/1.1) (2015-08-20)
 
