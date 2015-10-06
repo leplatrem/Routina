@@ -27,6 +27,7 @@
   "dependencies": {
     "bootstrap": "^3.3.5",
     "btoa": "^1.1.2",
+    "kinto": "^1.0.0-rc.5",
     "moment": "^2.10.6",
     "react": "^0.13.3",
     "uuid": "^2.0.1"
@@ -45,7 +46,6 @@
     "karma-sinon": "^1.0.4",
     "karma-sourcemap-loader": "^0.3.5",
     "karma-webpack": "^1.7.0",
-    "kinto": "^1.0.0-rc.3",
     "less": "^2.5.1",
     "less-loader": "^2.2.0",
     "mocha": "^2.2.5",

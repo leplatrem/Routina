@@ -127,21 +127,30 @@ describe("App", () => {
 
 
     describe("Authenticated", () => {
-      const user = "abcde";
+      var auth;
 
       beforeEach(() => {
-        rendered = TestUtils.renderIntoDocument(<App store={store} user={user}/>);
+        auth = {loginURI: () => {}, authenticated: false};
+        rendered = TestUtils.renderIntoDocument(<App store={store} auth={auth}/>);
       });
 
-      it("sync records on mount if user is provided", () => {
+      it("sync records on mount if auth is provided", () => {
         sinon.assert.calledOnce(store.sync);
       });
 
-      it("shows a permalink with location hash", () => {
+      it("shows a signin button", () => {
         var node = React.findDOMNode(rendered);
-        var selector = "a[href='https://leplatrem.github.io/Routina/#" + user + "']"
+        expect(node.querySelectorAll("a.signin").length).to.eql(1);
+      });
+
+      it("shows a permalink with location hash", () => {
+        auth.token = 'mat';
+        rendered = TestUtils.renderIntoDocument(<App store={store} auth={auth}/>);
+        var node = React.findDOMNode(rendered);
+        var selector = "a[href='https://leplatrem.github.io/Routina/#mat']"
         expect(node.querySelectorAll(selector).length).to.eql(1);
-      })
+      });
+
     });
 
 

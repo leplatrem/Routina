@@ -1,4 +1,5 @@
 import { EventEmitter } from "events";
+import Kinto from "kinto";
 
 import { Routine } from "./models";
 
@@ -124,19 +125,12 @@ export class Store extends EventEmitter {
     }
 
     this.busy = true;
-    return this.collection.sync()
+    return this.collection.sync({strategy: Kinto.syncStrategy.SERVER_WINS})
       .then((res) => {
         this.busy = false;
-
         if (res.ok) {
           return this.load();
         }
-
-        // If conflicts, take remote version and sync again (recursively).
-        return Promise.all(res.conflicts.map(conflict => {
-          return this.collection.resolve(conflict, conflict.remote);
-        }))
-        .then(_ => this.sync());
       })
       .catch(this.onError.bind(this));
   }

@@ -186,15 +186,8 @@ describe("Store", () => {
     });
 
     it("resolves conflicts using remote records", (done) => {
-      const conflict = {remote: {id: 1, label: "remote"}};
-
-      store.collection.sync
-        .onFirstCall().returns(Promise.resolve({ok: false, conflicts: [conflict]}))
-        .onSecondCall().returns(Promise.resolve({ok: true}));
-      sandbox.stub(store.collection, "resolve").returns(Promise.resolve({}));
-
       store.on("change", event => {
-        sinon.assert.calledWithExactly(store.collection.resolve, conflict, conflict.remote);
+        sinon.assert.calledWithExactly(store.collection.sync, { strategy: "server_wins" });
         done();
       });
       store.sync();
