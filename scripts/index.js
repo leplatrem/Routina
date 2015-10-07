@@ -17,7 +17,8 @@ import Kinto from "kinto";
 const server = "https://kinto.dev.mozaws.net/v1";
 
 // Migrate from Routina v1.1.
-window.localStorage.setItem("lastuser", window.localStorage.getItem("lastuser"));
+window.localStorage.setItem("lastToken", (window.localStorage.getItem("lastuser") ||
+                                          window.localStorage.getItem("lastToken")));
 
 // Authenticate using location hash.
 const auth = new Auth(server, window.localStorage);
