@@ -6,10 +6,25 @@ import { Routine } from "./models";
 
 export class Store extends EventEmitter {
 
-  constructor(kinto, collection) {
+  constructor(dataset) {
     super();
     this.state = {items: [], online: true, busy: false};
-    this.collection = kinto.collection(collection);
+    this.server = '';
+    this.dataset = dataset;
+    this.collection = null;
+  }
+
+  set config(config) {
+    this.server = config.server;
+  }
+
+  set credentials(credentials) {
+    const kinto = new Kinto({
+      remote: this.server,
+      dbPrefix: credentials.userid,
+      headers: credentials.headers
+    });
+    this.collection = kinto.collection(this.dataset);
   }
 
   deserialize(data) {

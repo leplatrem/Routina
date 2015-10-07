@@ -177,15 +177,35 @@ export default class App extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = this.props.store.state;
-
-    this.props.store.load();
-    if (this.props.auth) {
-      this.syncRecords();
-    }
+    this.state = Object.assign({}, this.props.store.state);
+    this.state.authenticated = false;
+    this.state.token = '';
   }
 
   componentDidMount() {
+    this.props.auth.on('login', credentials => {
+      // Refresh auth UI.
+      this.setState({
+        authenticated: credentials.authenticated,
+        token: credentials.token
+      });
+      // Connect, load and sync store.
+      this.props.store.credentials = credentials;
+      this.props.store.load();
+      this.syncRecords();
+    });
+
+    this.props.config.on('configured', config => {
+      this.props.store.config = config;
+      this.props.auth.config = config;
+
+      // Authenticate using config.
+      this.props.auth.authenticate();
+    });
+
+    // Load config at startup.
+    this.props.config.load();
+
     this.props.store.on("online", state => {
       this.setState({online: state});
     });
@@ -248,24 +268,22 @@ export default class App extends React.Component {
     const syncLabel = this.state.online ? (busy ? "Syncing..." : "Sync") : "Offline";
 
     var signIn = '';
+    if (!this.state.authenticated) {
+      signIn = (
+        <a className="btn default fit signin" href={this.props.auth.loginURI(window.location.href)}>
+          <span className="glyphicon glyphicon-user" aria-hidden="true"></span>
+          Sign in
+        </a>
+      );
+    }
     var permaLink = '';
-    if (this.props.auth) {
-      if (!this.props.auth.authenticated) {
-        signIn = (
-          <a className="btn default fit signin" href={this.props.auth.loginURI(window.location.href)}>
-            <span className="glyphicon glyphicon-user" aria-hidden="true"></span>
-            Sign in
-          </a>
-        );
-      }
-      if (this.props.auth.token) {
-        permaLink = (
-          <a className="fit" href={"https://leplatrem.github.io/Routina/#" + this.props.auth.token}>
-            <span className="glyphicon glyphicon-link" aria-hidden="true"></span>
-            Permalink
-          </a>
-        );
-      }
+    if (this.state.token) {
+      permaLink = (
+        <a className="fit" href={"https://leplatrem.github.io/Routina/#" + this.state.token}>
+          <span className="glyphicon glyphicon-link" aria-hidden="true"></span>
+          Permalink
+        </a>
+      );
     }
 
     return (
