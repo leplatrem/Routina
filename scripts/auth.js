@@ -14,7 +14,7 @@ export class Auth extends EventEmitter {
   }
 
   loginURI(website) {
-    const login = this.server.replace("v1", "fxa-oauth/login?redirect=");
+    const login = this.server.replace("v1", "v1/fxa-oauth/login?redirect=");
     const currentWebsite = website.replace(/#.*/, '');
     const redirect = encodeURIComponent(currentWebsite + '#fxa:');
     return login + redirect;
