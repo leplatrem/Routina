@@ -31,7 +31,7 @@ describe("Auth", () => {
 
     it("contains an encoded version of URL with hash", () => {
       var result = auth.loginURI("http://routina.com");
-      var base = "http://server/fxa-oauth/login?redirect="
+      var base = "http://server/v1/fxa-oauth/login?redirect="
       expect(result).to.eql(base + "http%3A%2F%2Froutina.com%23fxa%3A");
     });
 
