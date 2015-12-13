@@ -10,6 +10,12 @@ export class Store extends EventEmitter {
     super();
     this.state = {items: [], online: true, busy: false};
     this.collection = kinto.collection(collection);
+    this.headers = {};
+  }
+
+  set credentials(credentials) {
+    // XXX : Not possible this.collection.dbPrefix = credentials.userid;
+    this.headers = Object.assign({}, credentials.headers);
   }
 
   deserialize(data) {
@@ -125,7 +131,7 @@ export class Store extends EventEmitter {
     }
 
     this.busy = true;
-    return this.collection.sync({strategy: Kinto.syncStrategy.SERVER_WINS})
+    return this.collection.sync({headers: this.headers, strategy: Kinto.syncStrategy.SERVER_WINS})
       .then((res) => {
         this.busy = false;
         if (res.ok) {

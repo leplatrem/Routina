@@ -180,12 +180,16 @@ export default class App extends React.Component {
     this.state = this.props.store.state;
 
     this.props.store.load();
-    if (this.props.auth) {
-      this.syncRecords();
-    }
   }
 
   componentDidMount() {
+    this.props.auth.on("login", (credentials) => {
+      this.props.store.credentials(credentials);
+      this.syncRecords();
+    });
+
+    this.props.auth.authenticate(window.location.hash);
+
     this.props.store.on("online", state => {
       this.setState({online: state});
     });

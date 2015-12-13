@@ -9,8 +9,29 @@ export class Auth extends EventEmitter {
     super();
     this.server = server;
     this.store = store;
-    this.headers = {};
-    this.token = null;
+
+    /*
+    navigator.mozId.watch({
+      wantIssuer: 'firefox-accounts',
+      audience: 'https://token.services.mozilla.com/',
+      onlogin: function(assertion) {
+        console.log('onlogin', assertion);
+
+        // Trade Assertion for BearerToken on Firefox Account server
+        // /ping fermj :)
+
+      },
+      onerror: function(error) {
+        console.error(error);
+      },
+      onlogout: function() {
+        console.log('onlogout');
+      },
+      onready: function() {
+        console.log('onready');
+      }
+    });
+    */
   }
 
   loginURI(website) {
@@ -25,24 +46,35 @@ export class Auth extends EventEmitter {
     if (!token) {
       token = this.store.getItem("lastToken") || uuid4();
     }
-    this.token = token;
+    /*
+
+      navigator.mozId.request({
+        oncancel: function() {
+          console.log('User killed dialog.');
+        }
+      });
+
+    */
+    var userid = '';
+    var headers = {};
+
     this.store.setItem("lastToken", token);
     this.authenticated = false;
 
     if (token.indexOf('fxa:') === 0) {
       // Fxa token passed in URL from redirection.
       let bearerToken = token.replace('fxa:', '');
-      this.headers.Authorization = 'Bearer ' + bearerToken;
+      headers.Authorization = 'Bearer ' + bearerToken;
       this.authenticated = true;
-      this.token = '';  // Forget token.
-      this.userid = '';  // XXX: fetch from profile server.
     }
     else {
       // Token provided via hash, but no FxA.
       // Use Basic Auth as before.
       let userpass64 = btoa(token + ":s3cr3t");
-      this.userid = userpass64;
-      this.headers.Authorization = 'Basic ' + userpass64;
+      userid = userpass64;
+      headers.Authorization = 'Basic ' + userpass64;
     }
+
+    this.emit('login', {userid: userid, headers: headers});
   }
 }
